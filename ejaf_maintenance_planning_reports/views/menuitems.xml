@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <data>
+        <menuitem id="maintenance_planning_reports"
+                  name="Maintenance Planning Reports"
+                  parent="ejaf_maintenance_menus.maintenance_reporting_categ"
+                  action="maintenance_planning_reports_action" sequence="2"/>
+
+
+        <menuitem id="site_plan_xlsx"
+                  name="Site Plan Xls"
+                  parent="ejaf_maintenance_menus.site_reporting_categ"
+                  action="site_plan_report_action" sequence="2"/>
+
+        <menuitem id="site_pm_tracker_reports"
+                  name="Site PM Tracker Report"
+                  parent="ejaf_maintenance_menus.site_reporting_categ"
+                  action="site_pm_tracker_reports_action" sequence="3"/>
+
+
+        <menuitem id="ppm_monthly_report"
+                  name="PPM Monthly Reports"
+                  parent="ejaf_maintenance_menus.generator_reporting_categ"
+                  action="ppm_monthly_reports_action" sequence="1"/>
+
+        <menuitem id="generator_planning_report"
+                  name="قائمة فحص المولدات"
+                  parent="ejaf_maintenance_menus.generator_reporting_categ"
+                  action="generator_planning_action" sequence="2"/>
+
+
+        <menuitem id="fuel_analysis_id"
+                  name="Fuel Analysis"
+                  parent="ejaf_maintenance_menus.fuel_reporting_categ"
+                  action="fuel_analysis_report_action" sequence="1"/>
+
+        <menuitem id="fuel_distribution_id"
+                  name="Fuel Distribution"
+                  parent="ejaf_maintenance_menus.fuel_reporting_categ"
+                  action="fuel_distribution_report_action" sequence="2"/>
+
+        <menuitem id="fuel_plan_id"
+                  name="Fuel Plan"
+                  parent="ejaf_maintenance_menus.fuel_reporting_categ"
+                  action="fuel_plan_report_action" sequence="3"/>
+
+
+        <menuitem id="daily_outage_report_menu"
+                  name="Daily Outage Report"
+                  parent="ejaf_maintenance_menus.daily_reporting_categ"
+                  action="daily_outage_report_action" sequence="1"/>
+
+    </data>
+</odoo>

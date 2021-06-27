@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <data>
+        <record id="checklist_question_form_view" model="ir.ui.view">
+            <field name="name">check.list.question</field>
+            <field name="model">check.list.question</field>
+            <field name="arch" type="xml">
+                <form string="">
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="name"/>
+                                <field name="category_id"/>
+                            </group>
+                            <group>
+                                <field name="sequence" />
+                                <field name="check_list_id" />
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="checklist_question_tree_view" model="ir.ui.view">
+            <field name="name">check.list.question.list</field>
+            <field name="model">check.list.question</field>
+            <field name="arch" type="xml">
+                <tree string="">
+                    <field name="sequence"  widget="handle"/>
+                    <field name="name"/>
+                    <field name="category_id"/>
+                    <field name="check_list_id"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="checklist_question_action" model="ir.actions.act_window">
+            <field name="name">Check List Questions</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">check.list.question</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+                <!-- Add Text Here -->
+              </p><p>
+                <!-- More details about what a user can do with this object will be OK -->
+              </p>
+            </field>
+        </record>
+
+
+
+        <menuitem id="checklist_question_menu"
+                  parent="checklist_categ_menu"
+                  action="checklist_question_action"
+                  sequence="1"/>
+    </data>
+</odoo>

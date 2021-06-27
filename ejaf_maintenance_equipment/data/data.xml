@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding='UTF-8'?>
+<odoo>
+    <record id="maintenance_planning_notification_cron" model="ir.cron">
+        <field name="name">Maintenance: send notifications generate planning maintenance requests</field>
+        <field name="model_id" ref="model_site_planning_line"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_generate_requests_send_notifications()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="numbercall">-1</field>
+        <field name="doall" eval="False"/>
+    </record>
+
+
+    <record id="fuel_planning_notification_cron" model="ir.cron">
+        <field name="name">Fuel: send notifications generate planning maintenance requests</field>
+        <field name="model_id" ref="model_fuel_planning"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_generate_requests_send_notifications()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="numbercall">-1</field>
+        <field name="doall" eval="False"/>
+    </record>
+
+    <record id="generator_maintenance_planning_notification_cron" model="ir.cron">
+        <field name="name">Generator Maintenance: send notifications generate planning maintenance requests</field>
+        <field name="model_id" ref="model_generator_planning_line"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_generate_requests_send_notifications()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="numbercall">-1</field>
+        <field name="doall" eval="False"/>
+    </record>
+
+    <record id="corrective_maintenance_type" model="maintenance.type">
+        <field name="name">corrective</field>
+    </record>
+
+    <record id="preventive_maintenance_type" model="maintenance.type">
+        <field name="name">preventive</field>
+    </record>
+
+    <record id="emergency_maintenance_type" model="maintenance.type">
+        <field name="name">emergency</field>
+    </record>
+
+    <record id="fuel_planning_maintenance_tag" model="maintenance.tag">
+        <field name="name">fuel_planning</field>
+    </record>
+
+    <record id="generators_maintenance_tag" model="maintenance.tag">
+        <field name="name">generators</field>
+    </record>
+
+    <record id="full_site_maintenance_tag" model="maintenance.tag">
+        <field name="name">full_site</field>
+    </record>
+
+</odoo>

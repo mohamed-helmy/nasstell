@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <data>
+
+        <menuitem id="sla_policies_menu"
+                  name="Sla Policy"
+                  parent="maintenance.menu_maintenance_configuration"
+                  sequence="3"
+                  action="sla_policies_action"/>
+
+    </data>
+</odoo>

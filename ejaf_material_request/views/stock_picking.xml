@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <data>
+        <record id="stock_picking_form_view_inherit_material" model="ir.ui.view">
+            <field name="name">stock.picking.form.view.inherit.material</field>
+            <field name="model">stock.picking</field>
+            <field name="inherit_id" ref="stock.view_picking_form"/>
+            <field name="arch" type="xml">
+                <field name="origin" position="after">
+                    <field name="material_request_id" readonly="1" force_save="1"/>
+                </field>
+            </field>
+        </record>
+    </data>
+</odoo>

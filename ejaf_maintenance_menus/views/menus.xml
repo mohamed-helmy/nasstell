@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <data>
+
+        <menuitem id="maintenance_reporting_categ" name="Maintenance Report" parent="maintenance.maintenance_reporting"
+                  sequence="1"/>
+        <menuitem id="site_reporting_categ" name="Site Reports" parent="maintenance.maintenance_reporting"
+                  sequence="2"/>
+        <menuitem id="generator_reporting_categ" name="Generator Reports" parent="maintenance.maintenance_reporting"
+                  sequence="3"/>
+        <menuitem id="fuel_reporting_categ" name="Fuel Reports" parent="maintenance.maintenance_reporting"
+                  sequence="4"/>
+        <menuitem id="daily_reporting_categ" name="Daily Outage" parent="maintenance.maintenance_reporting"
+                  sequence="5"/>
+
+        <menuitem
+                id="maintenance.maintenance_request_reporting"
+                action="maintenance.maintenance_request_action_reports"
+                parent="ejaf_maintenance_menus.maintenance_reporting_categ" sequence="1"/>
+
+
+    </data>
+</odoo>

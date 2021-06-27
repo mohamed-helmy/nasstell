@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="maintenance_request_activity_data1" model="maintenance.request.activity">
+            <field name="name">Oil</field>
+            <field name="code">A</field>
+        </record>
+        <record id="maintenance_request_activity_data2" model="maintenance.request.activity">
+            <field name="name">Oil Filter</field>
+            <field name="code">B</field>
+        </record>
+        <record id="maintenance_request_activity_data3" model="maintenance.request.activity">
+            <field name="name">Fuel Filter</field>
+            <field name="code">C</field>
+        </record>
+        <record id="maintenance_request_activity_data4" model="maintenance.request.activity">
+            <field name="name">Air Filter</field>
+            <field name="code">D</field>
+        </record>
+        <record id="maintenance_request_activity_data5" model="maintenance.request.activity">
+            <field name="name">Fuel Pupm Filter</field>
+            <field name="code">E</field>
+        </record>
+        <record id="maintenance_request_activity_data6" model="maintenance.request.activity">
+            <field name="name">Cleaning</field>
+            <field name="code">N</field>
+        </record>
+    </data>
+</odoo>
+
+

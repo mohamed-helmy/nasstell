@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <data>
+
+        <record id="maintenance_job_order_form_view" model="ir.ui.view">
+            <field name="name">maintenance.job.order.form</field>
+            <field name="model">maintenance.job.order</field>
+            <field name="arch" type="xml">
+                <form string="">
+                    <header>
+                        <field name="id" invisible="1"/>
+                        <button name="button_start_inspection" string="Start Inspection"
+                                attrs="{'invisible': [('state', '!=', 'draft')]}" type="object"/>
+                        <button name="button_start_repairing" string="Start Repairing"
+                                attrs="{'invisible': [('state', '!=', 'inspection')]}"
+                                type="object"/>
+
+                        <button name="action_done" string="Mark as Done"
+                                attrs="{'invisible': [('state', '!=', 'repairing')]}"
+                                type="object"/>
+
+                        <button name="create_technical_inspection" string="Create TI"
+                                attrs="{'invisible': [('technical_inspection_count', '!=', 0)]}"
+                                type="object"/>
+                        <field name="state" widget="statusbar"
+                               statusbar_visible="draft,inspection,repairing,done"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_button_box" name="button_box">
+                            <button class="oe_stat_button"
+                                    icon="fa-book"
+                                    name="action_view_technical_inspections"
+                                    type="object">
+                                <field name="technical_inspection_count" widget="statinfo" string="TI"/>
+                            </button>
+                        </div>
+                        <h1 class="d-none d-md-block">
+                            <field name="name" attrs="{'invisible': [('name','=','/')]}" readonly="1"/>
+                        </h1>
+                        <group>
+                            <group>
+                                <field name="equipment_id"/>
+                                <field name="maintenance_id"/>
+                                <field name="maintenance_team_id"/>
+                                <field name="site"/>
+                                <field name="effected_sites_no"/>
+                                <field name="effected_sites_cell"/>
+                                <field name="bsc_name"/>
+                                <field name="no_for_ericsson"/>
+                                <field name="bcf_no"/>
+                                <field name="region_id"/>
+                            </group>
+                            <group>
+                                <field name="sp_replaced"/>
+                                <field name="sla"/>
+                                <field name="oosal_duration"/>
+                                <field name="vol"/>
+                                <field name="invol"/>
+                            </group>
+
+                        </group>
+                        <notebook>
+                            <page string="Customer Complain" name="customer_complain">
+                                <field name="customer_complain" widget="html"
+                                       attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                            </page>
+                            <page name="problem_information" string="Problem Information">
+                                <group>
+                                    <group>
+                                        <field name="flm_action"/>
+                                        <field name="flm_comment"/>
+                                        <field name="problem_root_cause"/>
+                                        <field name="outage_type_id"/>
+                                        <field name="other_outrage_reason"/>
+                                    </group>
+                                    <group></group>
+                                </group>
+                            </page>
+                            <page string="Delivery Items" name="delivery_items">
+                                <field name="default_picking_type_id" invisible="1"/>
+                                <field name="delivery_ids" attrs="{'readonly': [('state', '!=', 'repairing')]}"
+                                       context="{'default_picking_type_id': default_picking_type_id}">
+                                    <tree>
+                                        <field name="name"/>
+                                        <field name="scheduled_date"/>
+                                        <field name="state"/>
+                                    </tree>
+                                </field>
+                            </page>
+                            <page string="Spare Part" name="spare_part">
+                                <field name="spare_part_ids" attrs="{'readonly': [('state', '=', 'done')]}">
+                                    <tree editable="bottom">
+                                        <field name="name"/>
+                                        <field name="product_id"/>
+                                        <field name="product_qty"/>
+                                    </tree>
+                                </field>
+                            </page>
+                            <page string="TimeSheet" name="maintenance_timesheet">
+                                <field name="timesheet_ids" attrs="{'readonly': [('state', '=', 'done')]}">
+                                    <tree editable="bottom">
+                                        <field name="name"/>
+                                        <field name="task_description"/>
+                                        <field name="order_check_in"/>
+                                        <field name="order_check_out"/>
+                                        <field name="duration"/>
+                                        <field name="cost"/>
+                                    </tree>
+                                </field>
+                                <group class="oe_subtotal_footer oe_right" colspan="2" name="total_cost">
+                                    <field name="total_cost"/>
+                                </group>
+                            </page>
+                            <page string="Work Done" name="work_done">
+                                <field name="work_done_ids" attrs="{'readonly': [('state', '=', 'done')]}">
+                                    <tree editable="bottom">
+                                        <field name="description"/>
+                                        <field name="date"/>
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers"/>
+                        <field name="message_ids" widget="mail_thread" options="{&quot;thread_level&quot;: 1}"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+
+        <record id="maintenance_job_order_tree" model="ir.ui.view">
+            <field name="name">Job Orders</field>
+            <field name="model">maintenance.job.order</field>
+            <field name="arch" type="xml">
+                <tree string="">
+                    <field name="name"/>
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="maintenance_job_order_action" model="ir.actions.act_window">
+            <field name="name">Job Order</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">maintenance.job.order</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    <!-- Add Text Here -->
+                </p>
+                <p>
+                    <!-- More details about what a user can do with this object will be OK -->
+                </p>
+            </field>
+        </record>
+
+
+        <menuitem id="maintenance_job_order_menu"
+                  parent="maintenance.menu_m_request"
+                  action="maintenance_job_order_action"
+                  sequence="100"/>
+
+    </data>
+</odoo>

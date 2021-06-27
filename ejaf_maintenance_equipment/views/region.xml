@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="region_form_view" model="ir.ui.view">
+            <field name="name">region.form</field>
+            <field name="model">region</field>
+            <field name="arch" type="xml">
+                <form string="Region">
+                    <sheet>
+                        <group>
+                            <field name="name"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        <record id="region_tree_view" model="ir.ui.view">
+            <field name="name">region.tree</field>
+            <field name="model">region</field>
+            <field name="arch" type="xml">
+                <tree string="Region">
+
+                    <field name="name"/>
+
+                </tree>
+            </field>
+        </record>
+        <record id="region_action_view" model="ir.actions.act_window">
+            <field name="name">Region</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">region</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    <!-- Add Text Here -->
+                </p>
+                <p>
+                    <!-- More details about what a user can do with this object will be OK -->
+                </p>
+            </field>
+        </record>
+        <menuitem id="region_action_menu" name="region" parent="maintenance.menu_maintenance_configuration"
+                  action="region_action_view" sequence="3"/>
+
+
+    </data>
+</odoo>

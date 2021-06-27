@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <data>
+        <record id="checklist_category_form_view" model="ir.ui.view">
+            <field name="name">check.list.category</field>
+            <field name="model">check.list.category</field>
+            <field name="arch" type="xml">
+                <form string="">
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="name"/>
+                            </group>
+                            <group>
+                                <field name="active" widget="boolean_toggle"/>
+                                <field name="is_generator" widget="boolean_toggle"/>
+                            </group>
+
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="checklist_category_tree_view" model="ir.ui.view">
+            <field name="name">check.list.category</field>
+            <field name="model">check.list.category</field>
+            <field name="arch" type="xml">
+                <tree string="">
+                    <field name="name"/>
+                    <field name="active" widget="boolean_toggle"/>
+                    <field name="is_generator" widget="boolean_toggle"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="checklist_category_action" model="ir.actions.act_window">
+            <field name="name">Check List Categories</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">check.list.category</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <menuitem id="checklist_category_menu"
+                  parent="checklist_categ_menu"
+                  action="checklist_category_action"
+                  sequence="1"/>
+    </data>
+</odoo>

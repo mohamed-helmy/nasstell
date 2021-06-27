@@ -1,0 +1,7 @@
+<odoo>
+    <template id="assets_backend" name="ejaf_maintenance_equipment_assets" inherit_id="web.assets_backend">
+        <xpath expr="//script[last()]" position="after">
+            <script type="text/javascript" src="/ejaf_maintenance_equipment/static/src/js/timer.js"></script>
+        </xpath>
+    </template>
+</odoo>

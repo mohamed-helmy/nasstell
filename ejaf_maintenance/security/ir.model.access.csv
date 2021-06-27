@@ -1,0 +1,10 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_outage_category_user,outage_category,model_outage_category,,1,1,1,1
+access_problem_category_user,problem_category,model_problem_category,,1,1,1,1
+access_outage_type_user,outage_type,model_outage_type,,1,1,1,1
+access_maintenance_timesheet,maintenance_timesheet,model_maintenance_timesheet,,1,1,1,1
+access_spare_part,spare_part,model_spare_part,,1,1,1,1
+access_maintenance_work_done,maintenance_work_done,model_maintenance_work_done,,1,1,1,1
+access_maintenance_job_order,maintenance_job_order,model_maintenance_job_order,,1,1,1,1
+access_technical_inspection,technical_inspection,model_technical_inspection,,1,1,1,1
+

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <data>
+        <record id="checklist_tree_view" model="ir.ui.view">
+            <field name="name">check.list.tree.view</field>
+            <field name="model">check.list</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="name"/>
+                    <field name="type"/>
+                    <field name="is_default"/>
+                    <field name="is_mandatory"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="checklist_form_view" model="ir.ui.view">
+            <field name="name">check.list</field>
+            <field name="model">check.list</field>
+            <field name="arch" type="xml">
+                <form string="">
+                    <sheet>
+                        <group>
+                            <field name="name"/>
+                        </group>
+                        <group>
+                            <field name="type" required="1"/>
+                        </group>
+                        <group>
+                            <field name="is_default"/>
+                            <field name="is_mandatory"/>
+                        </group>
+                        <notebook>
+                            <page string="Questions">
+                                <field name="check_list_question_ids">
+                                    <tree editable="bottom">
+                                        <field name="sequence" widget="handle"/>
+                                        <field name="name"/>
+                                        <field name="category_id"/>
+                                        <field name="question_type"/>
+                                        <field name="is_mandatory"/>
+                                        <field name="is_comment_required"/>
+
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        <record id="checklist_action" model="ir.actions.act_window">
+            <field name="name">Check List</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">check.list</field>
+            <field name="view_mode">tree,form</field>
+
+        </record>
+
+        <menuitem id="checklist_categ_menu"
+                  name="Check List"
+                  parent="maintenance.menu_maintenance_title"
+                  sequence="5"/>
+
+        <menuitem id="checklist_menu"
+                  parent="checklist_categ_menu"
+                  action="checklist_action"
+                  sequence="1"/>
+    </data>
+</odoo>

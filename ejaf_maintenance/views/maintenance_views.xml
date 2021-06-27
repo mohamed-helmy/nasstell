@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <data>
+        <record id="problem_category_form_view" model="ir.ui.view">
+            <field name="name">problem.category.form.view</field>
+            <field name="model">problem.category</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="name" required="1"/>
+                            </group>
+                            <group>
+                                <field name="parent_category_id"/>
+                            </group>
+                            <group>
+                                <field name="type" required="1"/>
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        <record id="maintenance_request_search_view_inherit" model="ir.ui.view">
+            <field name="name">maintenance.request.search.view.inherit</field>
+            <field name="model">maintenance.request</field>
+            <field name="inherit_id" ref="maintenance.hr_equipment_request_view_search"/>
+            <field name="arch" type="xml">
+                <filter name="kanban_state_block" position="attributes">
+                    <attribute name="string">Need To Repaired</attribute>
+                </filter>
+                <filter name="done" position="attributes">
+                    <attribute name="string">Reviewed</attribute>
+                </filter>
+                <xpath expr="//filter[last()]" position="after">
+                    <filter name="today" string="Today"
+                            domain="[('request_date', '=', context_today().strftime('%Y-%m-%d'))]"/>
+                    <filter name="start_date_filter" string="This Week" domain="[
+                        ('request_date', '>=', (datetime.datetime.combine(context_today() + relativedelta(weeks=-1,days=1,weekday=0), datetime.time(0,0,0)).to_utc()).strftime('%Y-%m-%d %H:%M:%S')),
+                        ('request_date', '&lt;', (datetime.datetime.combine(context_today() + relativedelta(days=1,weekday=0), datetime.time(0,0,0)).to_utc()).strftime('%Y-%m-%d %H:%M:%S'))]"/>
+                    <filter name="month" string="This Month"
+                            domain="['&amp;',('request_date', '&gt;=', (context_today() + relativedelta(day=1)).strftime('%Y-%m-%d')),('request_date', '&lt;=', (context_today() + relativedelta(months=1, day=1, days=-1)).strftime('%Y-%m-%d')),]"/>
+                    <filter name="this_year" string="This Year"
+                            domain="[
+                                '&amp;',
+                                ('request_date', '&gt;=', datetime.datetime.combine(context_today()+relativedelta(month=1,day=1), datetime.time(0,0,0) ) ),
+                                ('request_date', '&lt;=', datetime.datetime.combine(context_today()+relativedelta(month=12,day=31),  datetime.time(23,59,59))),
+                            ]"/>
+
+                </xpath>
+            </field>
+        </record>
+        <record id="hr_equipment_request_view_form" model="ir.ui.view">
+            <field name="name">maintenance.request</field>
+            <field name="model">maintenance.request</field>
+            <field name="inherit_id" ref="ejaf_maintenance_equipment.maintenance_request_form_view_inherit"/>
+            <field name="arch" type="xml">
+                <field name="equipment_id" position="attributes">
+                    <attribute name="string">Site</attribute>
+                    <attribute name="required">1</attribute>
+                </field>
+                <field name="email_cc" position="after">
+                    <field name="starting_time"
+                           attrs="{'invisible':[('maintenance_type','!=','preventive')]}"/>
+                    <field name="end_time" attrs="{'invisible':[('maintenance_type','!=','preventive')]}"/>
+                    <field name="duration_str" attrs="{'invisible':[('maintenance_type','!=','preventive')]}"/>
+                    <field name="is_team_leader" invisible="1"/>
+                </field>
+                <xpath expr="//field[@name='kanban_state']" position="attributes">
+                    <attribute name="attrs">{'invisible': [('is_team_leader', '!=', True)]}</attribute>
+                </xpath>
+                <field name="category_id" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </field>
+                <field name="user_id" position="attributes">
+                    <attribute name="string">Technician</attribute>
+                </field>
+                <field name="description" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </field>
+                <xpath expr="//div[@class='oe_right']" position="before">
+                    <div class="oe_button_box" name="button_box">
+                        <button string="Check List"
+                                class="oe_stat_button"
+                                type="object"
+                                attrs="{'invisible':[('maintenance_type','!=','preventive')]}"
+                                icon="fa-list" name="action_view_checklist">
+                        </button>
+                    </div>
+                </xpath>
+                <field name="equipment_id" position="after">
+                    <field name="site_code" readonly="1" force_save="1"/>
+                </field>
+                <xpath expr="//notebook" position="inside">
+                    <page string="By Korek NMC"
+                          attrs="{'invisible':[('maintenance_type','=','preventive')]}">
+                        <group>
+                            <group>
+                                <field name="ne_type_id"/>
+                                <field name="ne_impacted_id"/>
+                                <field name="gov"/>
+                                <field name="effected_trxs"
+                                       attrs="{'required':[('maintenance_type','=','emergency')]}"/>
+                                <field name="effected_cells"
+                                       attrs="{'required':[('maintenance_type','=','emergency')]}"/>
+                                <field name="effected_sites"
+                                       attrs="{'required':[('maintenance_type','=','emergency')]}"/>
+                            </group>
+                            <group>
+                                <field name="alarm_time"
+                                       attrs="{'required':[('maintenance_type','=','emergency')]}"/>
+                                <field name="tt_issuing_time"
+                                       attrs="{'required':[('maintenance_type','=','emergency')]}"/>
+                                <field name="closing_outage_time"
+                                       string="Restoration Time"/>
+                                <field name="outage_duration" invisible="1"/>
+                                <field name="outage_duration_str"/>
+                            </group>
+                            <group>
+                                <field name="bsc_name"/>
+                                <field name="tg_number"/>
+                                <field name="tt_issuer"
+                                       attrs="{'required':[('maintenance_type','=','emergency')]}"/>
+                                <field name="tt_no"
+                                       attrs="{'required':[('maintenance_type','=','emergency')]}"/>
+                                <field name="tt_status"
+                                       attrs="{'required':[('maintenance_type','=','emergency')]}"/>
+                            </group>
+                            <group>
+                                <field name="alarm_description"/>
+                            </group>
+                            <group>
+                                <field name="starting_outage_time"
+                                       invisible="1"/>
+
+                            </group>
+
+                        </group>
+                    </page>
+                    <page string="By Nastell FLM"
+                          attrs="{'invisible':[('maintenance_type','=','preventive')]}">
+                        <group>
+                            <group>
+                                <field name="id_permission_time" invisible="1"/>
+                                <div>
+                                    <label for="vol_str" style="width:40%"/>
+                                    <field name="vol_option"
+                                           string=""
+                                           widget="boolean_toggle"
+                                           class="o_light_label"/>
+                                    <br/>
+                                    <field name="vol_str"
+                                           readonly="1"
+                                           force_save="1"/>
+                                </div>
+                                <div>
+                                    <label for="in_vol_str" style="width:40%"/>
+                                    <field name="in_vol_option"
+                                           string=""
+                                           widget="boolean_toggle"
+                                           class="o_light_label"/>
+                                    <br/>
+                                    <field name="in_vol_str" readonly="1" force_save="1"/>
+                                </div>
+                            </group>
+                            <group>
+                                <field name="outage_category_id"/>
+                                <field name="problem_category_id"/>
+                                <field name="sub_category_id"/>
+                                <field name="id_permission_time_str"/>
+                            </group>
+                            <group>
+                                <field name="route_cause"/>
+                                <field name="why_it_happened"/>
+                                <field name="site_severity"/>
+                                <field name="action_taken"/>
+                                <field name="any_sp_used"/>
+                                <field name="comment"/>
+                            </group>
+                        </group>
+                    </page>
+                </xpath>
+
+                <xpath expr="//button[@name='reset_equipment_request']" position="after">
+                    <field name="job_order_count" invisible="1"/>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="problem_category_action" model="ir.actions.act_window">
+            <field name="name">Problem Category</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">problem.category</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                </p>
+            </field>
+        </record>
+        <menuitem id="problem_category_menu"
+                  name="Problem Category"
+                  parent="maintenance.menu_maintenance_configuration"
+                  action="problem_category_action"/>
+    </data>
+</odoo>

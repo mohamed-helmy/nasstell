@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <data>
+        <record id="maintenance_request_sla_form_view_inherit_fields" model="ir.ui.view">
+            <field name="name">maintenance.request.sla.form.view.inherit.fields</field>
+            <field name="model">maintenance.request</field>
+            <field name="inherit_id" ref="ejaf_maintenance.hr_equipment_request_view_form"/>
+            <field name="arch" type="xml">
+                <field name="outage_duration_str" position="after">
+                    <field name="maintenance_duration"
+                           readonly="1"
+                           attrs="{'invisible':[('maintenance_type','!=','emergency')]}"
+                           force_save="1"/>
+                    <field name="target_dead_time"/>
+                </field>
+            </field>
+        </record>
+        <record id="maintenance_request_sla_form_view_inherit" model="ir.ui.view">
+            <field name="name">maintenance.request.sla.form.view.inherit</field>
+            <field name="model">maintenance.request</field>
+            <field name="inherit_id" ref="maintenance.hr_equipment_request_view_form"/>
+            <field name="arch" type="xml">
+                <field name="duration" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </field>
+                <field name="priority" position="replace">
+                    <field name="maintenance_priority" readonly="1" force_save="1"/>
+                </field>
+
+                <xpath expr="//label[@for='duration']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+                <xpath expr="//sheet/group/group[2]/div" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+
+                <xpath expr="//sheet/group/group[2]" position="after">
+                    <group/>
+                    <group string="Sla Info" attrs="{'invisible':[('maintenance_type','!=','emergency')]}">
+                        <field name="sla_policy_id"/>
+
+                    </group>
+                </xpath>
+            </field>
+        </record>
+
+    </data>
+</odoo>

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="mmu_type_form_view" model="ir.ui.view">
+            <field name="name">mmu.type.form</field>
+            <field name="model">mmu.type</field>
+            <field name="arch" type="xml">
+                <form string="MMU Type">
+                    <sheet>
+                        <group>
+                            <field name="name"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        <record id="mmu_type_tree_view" model="ir.ui.view">
+            <field name="name">mmu.type.tree</field>
+            <field name="model">mmu.type</field>
+            <field name="arch" type="xml">
+                <tree string="MMU type">
+
+                    <field name="name"/>
+                </tree>
+            </field>
+        </record>
+        <record id="mmu_type_action_view" model="ir.actions.act_window">
+            <field name="name">MMU Type</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">mmu.type</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    <!-- Add Text Here -->
+                </p>
+                <p>
+                    <!-- More details about what a user can do with this object will be OK -->
+                </p>
+            </field>
+        </record>
+        <!-- This Menu Item must have a parent and an action -->
+        <menuitem id="mmu_type_action_menu" name="MMU Type" parent="maintenance.menu_maintenance_configuration"
+                  action="mmu_type_action_view" sequence="15"/>
+
+
+    </data>
+</odoo>

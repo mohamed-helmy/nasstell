@@ -1,0 +1,7 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_daily_outage_report,access_daily_outage_report,model_daily_outage_report,,1,1,1,1
+access_fuel_analysis_report,access_fuel_analysis_report,model_fuel_analysis_report,,1,1,1,1
+access_generator_planning_report,access_generator_planning_report,model_generator_planning_report,,1,1,1,1
+access_maintenance_planning_reports,access_maintenance_planning_reports,model_maintenance_planning_reports,,1,1,1,1
+access_ppm_monthly_report,access_ppm_monthly_report,model_ppm_monthly_report,,1,1,1,1
+access_site_pm_tracker_report,access_site_pm_tracker_report,model_site_pm_tracker_report,,1,1,1,1

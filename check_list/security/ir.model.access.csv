@@ -1,0 +1,11 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_checklist_admin,checklist.admin,model_check_list,base.group_system,1,1,1,1
+access_checklist_user,checklist.user,model_check_list,base.group_user,1,0,0,0
+
+access_checklist_category_admin,checklist.category.admin,model_check_list_category,base.group_system,1,1,1,1
+access_checklist_category_user,checklist.category.user,model_check_list_category,base.group_user,1,0,0,0
+
+access_checklist_question_admin,checklist.question.admin,model_check_list_question,base.group_system,1,1,1,1
+access_checklist_question_user,checklist.question.user,model_check_list_question,base.group_user,1,0,0,0
+
+access_checklist_question_line_admin,checklist.question.line.admin,model_check_list_question_line,,1,1,1,1
