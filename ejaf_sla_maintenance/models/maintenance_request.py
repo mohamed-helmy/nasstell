@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
+import logging
 from odoo import api, fields, models, _
 from datetime import timedelta
+_logger = logging.getLogger(__name__)
+from odoo.exceptions import ValidationError
 
 
 class MaintenanceRequest(models.Model):
@@ -44,9 +47,29 @@ class MaintenanceRequest(models.Model):
             res = super(MaintenanceRequest, self).action_timer_stop()
             if request.maintenance_duration and request.outage_duration_str:
                 maintenance_duration_arr = request.maintenance_duration.split(':')
-                maintenance_duration_h = int(float(maintenance_duration_arr[0]))
-                maintenance_duration_m = int(float(maintenance_duration_arr[1]))
-                maintenance_duration_s = int(float(maintenance_duration_arr[2]))
+
+
+                if 0 < len(maintenance_duration_arr):
+                    maintenance_duration_h = int(float(maintenance_duration_arr[0]))
+                else:
+                    maintenance_duration_h = 0
+
+
+
+                if 1 < len(maintenance_duration_arr):
+                    maintenance_duration_m = int(float(maintenance_duration_arr[1]))
+                else:
+                    maintenance_duration_m = 0
+
+   
+
+                if 2 < len(maintenance_duration_arr):
+                    maintenance_duration_s = int(float(maintenance_duration_arr[2]))
+                else:
+                    maintenance_duration_s = 0
+
+         
+
                 maintenance_duration_seconds = maintenance_duration_s + maintenance_duration_m * 60 + maintenance_duration_h * 60 * 60
                 outage_duration_arr = request.outage_duration_str.split(':')
                 outage_duration_h = int(float(outage_duration_arr[0]))
@@ -55,6 +78,12 @@ class MaintenanceRequest(models.Model):
                 outage_duration_seconds = outage_duration_s + outage_duration_m * 60 + outage_duration_h * 60 * 60
                 if maintenance_duration_seconds > outage_duration_seconds:
                     user = request.maintenance_team_id.team_leader_id
+                    _logger.info('----------------------------')
+                    _logger.info(user.partner_id.id)
+                    _logger.info('----------------------------')
+                    if user.partner_id.id == False:
+                        raise ValidationError('There is No Team Leader in Your Team')
+
                     partner_ids = [user.partner_id.id]
                     request.message_post(
                         partner_ids=partner_ids,

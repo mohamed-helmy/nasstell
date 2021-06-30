@@ -104,7 +104,7 @@ class MaintenanceEquipment(models.Model):
     korek_transformer = fields.Float(string="Korek CP Transformer KVA", tracking=True)
     electric_contract_id = fields.Char(string='Electric Contract ID')
     payment = fields.Char(string='Payment')
-    ventilation = fields.Selection(string="Ventilation", selection=[('a', 'A'), ('yes', 'Yes'), ('a_n', 'N/A')],
+    ventilation = fields.Selection(string="Ventilation", selection=[('no', 'No'), ('yes', 'Yes'), ('a_n', 'N/A')],
                                    tracking=True)
     generator_ids = fields.One2many(comodel_name="site.generator", inverse_name="site_id")
     fuel_ids = fields.One2many(comodel_name="fuel.planning", inverse_name="site_id")
@@ -263,7 +263,7 @@ class MaintenanceEquipment(models.Model):
     battery_manufacturing_date = fields.Date(string="Battery Manufacturing Date", required=False, )
     battery_manufacturer_id = fields.Many2one(comodel_name="battery.manufacturer", string="Battery Manufacturer",
                                               required=False, )
-    battery_model_id = fields.Many2one(comodel_name="battery.model", string="Battery Manufacturer", required=False, )
+    battery_model_id = fields.Many2one(comodel_name="battery.model", string="Battery Model", required=False, )
     fiber_connection_id = fields.Many2one(comodel_name="fiber.connection", string="Fiber Connection", required=False, )
     mw_link_type = fields.Selection(string="MW link Type (Ericsson/NOKIA)",
                                     selection=[('null', 'Null value'), ('nokia', 'Nokia'),
