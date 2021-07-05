@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <data>
+        <record id="maintenance_equipment_form_view_inherit" model="ir.ui.view">
+            <field name="name">maintenance.equipment.form.view.inherit</field>
+            <field name="model">maintenance.equipment</field>
+            <field name="inherit_id" ref="ejaf_maintenance_equipment.hr_equipment_view_form2"/>
+            <field name="arch" type="xml">
+                <xpath expr="//div[@class='oe_button_box']" position="inside">
+                    <button name="action_view_material_requests"
+                            class="oe_stat_button"
+                            icon="fa-list"
+                            type="object">
+                        <div class="o_field_widget o_stat_info">
+                            <span class="o_stat_value">
+                                <field name="material_request_count"/>
+                            </span>
+                            <span class="o_stat_text">Material Reqs</span>
+                        </div>
+                    </button>
+                    <button name="action_view_returned_material_requests"
+                            class="oe_stat_button"
+                            icon="fa-list"
+                            type="object">
+                        <div class="o_field_widget o_stat_info">
+                            <span class="o_stat_value">
+                                <field name="returned_material_request_count"/>
+                            </span>
+                            <span class="o_stat_text">Return Materials</span>
+                        </div>
+                    </button>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

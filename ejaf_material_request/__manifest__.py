@@ -13,7 +13,8 @@
         'views/material_request.xml',
         'views/res_config_settings.xml',
         'views/maintenance_request.xml',
-        'views/stock_picking.xml'
+        'views/stock_picking.xml',
+        'views/maintenance_equipment.xml',
 
     ],
     'demo': [

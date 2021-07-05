@@ -20,6 +20,7 @@ class MaterialRequest(models.Model):
     name = fields.Char(string='Name')
     description = fields.Char(string='Description')
     maintenance_request_id = fields.Many2one('maintenance.request', string='Maintenance Request')
+    site_id = fields.Many2one('maintenance.equipment', string='Site', related='maintenance_request_id.equipment_id', store=1)
     line_ids = fields.One2many('material.request.line', 'material_request_id', string='Lines')
     picking_id = fields.Many2one('stock.picking', string='Picking')
     state = fields.Selection(

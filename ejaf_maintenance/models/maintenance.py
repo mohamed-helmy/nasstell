@@ -69,7 +69,7 @@ class Maintenance(models.Model):
     site_severity = fields.Many2one('maintenance.equipment.category', related='equipment_id.category_id',
                                     string='Site Severity')
     action_taken = fields.Char(string='Action Taken')
-    any_sp_used = fields.Selection([('yes', 'Yes'), ('no', 'No')], string='Any SP Used', default='yes')
+    any_sp_used = fields.Selection([('yes', 'Yes'), ('no', 'No')], string='Any SP Used', default='no')
     comment = fields.Char(string='Comment')
     kanban_state = fields.Selection(
         [('normal', 'In Progress'), ('blocked', 'Need To Repaired'), ('done', 'Reviewed')],

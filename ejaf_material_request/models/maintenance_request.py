@@ -1,4 +1,7 @@
+# -*- coding: utf-8 -*-
+
 from odoo import api, fields, models, _
+from odoo.exceptions import ValidationError
 
 
 class ActualMaterialUsed(models.Model):
@@ -227,3 +230,9 @@ class MaintenanceRequest(models.Model):
             'domain': [('maintenance_request_id', '=', self.id), ('returned', '=', True)],
             'context': {'default_maintenance_request_id': self.id, 'default_returned': True}
         }
+
+    def action_timer_stop(self):
+        self.ensure_one()
+        if self.any_sp_used == 'yes' and not self.material_request_ids.filtered(lambda mr: mr.state == 'transferred'):
+            raise ValidationError(_('No transferred material request for this record.'))
+        return super(MaintenanceRequest, self).action_timer_stop()

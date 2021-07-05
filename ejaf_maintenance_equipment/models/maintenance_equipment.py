@@ -448,3 +448,11 @@ class MaintenanceEquipment(models.Model):
     def get_effected_sites_no(self):
         for rec in self:
             rec.effected_sites_no = len(rec.child_ids)
+
+    def write(self, vals):
+        res = super(MaintenanceEquipment, self).write(vals)
+        if vals.get('parent_id', False):
+            for rec in self:
+                if rec.parent_id and rec not in rec.parent_id.child_ids:
+                    rec.parent_id.child_ids = [(4, rec.id)]
+        return res
