@@ -51,6 +51,8 @@
                                         <field name="is_comment_required" readonly="1" invisible="1"/>
                                         <field name="yes_answer" widget="boolean_toggle"/>
                                         <field name="no_answer" widget="boolean_toggle"/>
+                                        <field name="no_ok_answer" widget="boolean_toggle"/>
+                                        <field name="na_answer" widget="boolean_toggle"/>
                                         <field name="comment"
                                                attrs="{'required':[('no_answer','=',True),('is_comment_required', '=', True)]}"/>
                                         <field name="attach_ids" widget="many2many_binary"/>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="ti_form_view" model="ir.ui.view">
+            <field name="name">technical.inspection.form</field>
+            <field name="model">technical.inspection</field>
+            <field name="inherit_id" ref="ejaf_maintenance.ti_form_view"/>
+            <field name="arch" type="xml">
+
+                <xpath expr="//button[@name='action_submit']" position="after">
+                    <button string="Print TI Report" name="print_xlsx_report" type="object"
+                            class="oe_highlight" attrs="{'invisible': [('state', 'not in', ['submitted'])]}"
+                    />
+                </xpath>
+
+            </field>
+        </record>
+        <report
+                id="print_technical_inspection_report"
+                model="technical.inspection"
+                string="Technical Inspection Report"
+                report_type="xlsx"
+                name="ejaf_tec_inspection_report.technical_inspection_xlsx"
+                file="ejaf_tec_inspection_report.technical_inspection_xlsx"
+                attachment_use="False"
+                menu="False"/>
+
+
+    </data>
+</odoo>

@@ -198,33 +198,26 @@ class FuelAnalysisReportXlsx(models.AbstractModel):
             worksheet.set_column(row, 5, 20)
             row += 1
             number = 1
-            for site in self.env['maintenance.equipment'].search([]):
-                last_maintenance_req_in_site = self.env['maintenance.request'].sudo().search(
+            for request in self.env['maintenance.request'].search(
                     [('maintenance_type', '=', 'preventive'), ('maintenance_tag', '=', 'fuel_planning'),
-                     ('equipment_id', '=', site.id)], order="timer_first_start desc", limit=1)
-                if last_maintenance_req_in_site and last_maintenance_req_in_site.timer_first_start and start_date <= last_maintenance_req_in_site.timer_first_start.date() <= end_date:
+                     ('starting_time', '!=', False)], order="starting_time desc"):
+                if request.starting_time and start_date <= request.starting_time.date() <= end_date:
                     worksheet.write(row, 0, str(number), f22)
-                    worksheet.write(row, 1, str(site.site) if site and site.site else '', f22)
+                    worksheet.write(row, 1, str(request.equipment_id.site) if request.equipment_id and request.equipment_id.site else '', f22)
                     worksheet.set_column(row, 1, 20)
-                    worksheet.write(row, 2, str(site.name) if site and site.name else '', f22)
+                    worksheet.write(row, 2, str(request.equipment_id.name) if request.equipment_id and request.equipment_id.name else '', f22)
                     worksheet.set_column(row, 2, 20)
                     worksheet.write(row, 3,
-                                    str(last_maintenance_req_in_site.timer_first_start) if last_maintenance_req_in_site and last_maintenance_req_in_site.timer_first_start else '',
+                                    str(request.starting_time) if request.starting_time and request.starting_time else '',
                                     f3)
                     worksheet.set_column(row, 3, 20)
                     worksheet.write(row, 4,
-                                    str(last_maintenance_req_in_site.remain_letters if last_maintenance_req_in_site.remain_letters else ''),
+                                    str(request.remain_letters if request.remain_letters else ''),
                                     f3)
                     worksheet.set_column(row, 4, 20)
-                    remain_days = 0
-                    total = last_maintenance_req_in_site.g1rh + last_maintenance_req_in_site.g2rh
-                    if last_maintenance_req_in_site.tank_size and total and last_maintenance_req_in_site.days:
-                        remain_days = (last_maintenance_req_in_site.tank_size - 500) / ((
-                                total / last_maintenance_req_in_site.days))
 
-                    next_visit = last_maintenance_req_in_site.timer_first_start + timedelta(days=int(remain_days))
                     worksheet.write(row, 5,
-                                    str(next_visit) if next_visit else '',
+                                    str(request.next_visit_plan) if request.next_visit_plan else '',
                                     f3)
                     worksheet.set_column(row, 5, 20)
 

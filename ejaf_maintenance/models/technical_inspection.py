@@ -22,7 +22,7 @@ class TechnicalInspection(models.Model):
     job_order_id = fields.Many2one(comodel_name="maintenance.job.order", string="Job Order",
                                    track_visibility='always', required=False, ondelete="cascade")
     question_line_ids = fields.One2many(comodel_name="check.list.question.line",
-                                        inverse_name="technical_inspection_id")
+                                        inverse_name="technical_inspection_id", readonly=False)
     check_list_id = fields.Many2one(comodel_name="check.list", string="CheckList")
 
     site_before_attach_ids = fields.Many2many('ir.attachment', 'sit_att_rel', 'ti_id', 'attach_id',

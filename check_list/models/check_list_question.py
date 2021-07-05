@@ -33,4 +33,6 @@ class CheckListQuestionLine(models.Model):
     answer = fields.Selection(string="Answer", selection=[('yes', 'Yes'), ('no', 'No')])
     yes_answer = fields.Boolean(string='Yes')
     no_answer = fields.Boolean(string='No')
+    no_ok_answer = fields.Boolean(string='NoT OK')
+    na_answer = fields.Boolean(string='NA')
     comment = fields.Char(string="Comment")
