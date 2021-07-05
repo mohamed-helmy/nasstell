@@ -12,7 +12,7 @@ class ResConfigSettings(models.TransientModel):
                                                       string='Generator Planning Notify Period', readonly=False)
     fuel_planning_notify_period = fields.Integer(related='company_id.fuel_planning_notify_period',
                                                  string='Fuel Planning Notify Period', readonly=False)
-    reservation_liters = fields.Integer(string='Reservation Liters')
+    reservation_liters = fields.Float(string='Reservation Liters')
 
     @api.model
     def get_values(self):

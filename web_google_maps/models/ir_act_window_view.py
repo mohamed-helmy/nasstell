@@ -8,5 +8,5 @@ class IrActionsActWindowView(models.Model):
 
     view_mode = fields.Selection(
         selection_add=[('google_map', 'Google Maps')],
-        ondelete={'google_map': 'cascade'},
+        # ondelete={'google_map': 'cascade'},
     )

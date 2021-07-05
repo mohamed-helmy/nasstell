@@ -18,7 +18,7 @@ class SitePlanning(models.Model):
         return [('id', 'in', teams.ids)]
 
     site_id = fields.Many2one(comodel_name="maintenance.equipment", required=False, ondelete="cascade")
-    site_name = fields.Char(string='Site Name')
+    site_name = fields.Char(string='Site Name', related='site_id.name')
     maintenance_team_id = fields.Many2one(comodel_name="maintenance.team", required=True, domain=_get_full_site_teams)
     planning_lines_ids = fields.One2many(comodel_name="site.planning.line", inverse_name="plan_id")
 
@@ -209,7 +209,7 @@ class SitePlanningLine(models.Model):
 
     site_id = fields.Many2one(comodel_name="maintenance.equipment", required=False, ondelete="cascade")
     plan_id = fields.Many2one(comodel_name="site.planning", required=True, ondelete="cascade")
-    site_name = fields.Char(string='Site Name')
+    site_name = fields.Char(string='Site Name', related='site_id.name')
     maintenance_request_id = fields.Many2one(comodel_name="maintenance.request")
     maintenance_team_id = fields.Many2one(comodel_name="maintenance.team", related='plan_id.maintenance_team_id',
                                           store=1)

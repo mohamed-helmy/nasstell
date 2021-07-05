@@ -69,7 +69,6 @@ class MaintenanceRequest(models.Model):
     @api.depends('material_request_ids')
     def get_material_lines(self):
         for req in self:
-            print("hhhhhhhhhhhhhh")
             material_lines = []
             data = {}
             if req.material_request_ids:

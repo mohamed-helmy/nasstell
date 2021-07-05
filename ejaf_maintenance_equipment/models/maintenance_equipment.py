@@ -202,11 +202,11 @@ class MaintenanceEquipment(models.Model):
     date_start = fields.Date(string='Start Date', default=fields.Date.today, required=1, tracking=True)
     date_end = fields.Date(string='End Date', tracking=True)
 
-    tank_size = fields.Integer(string=' Fuel Tank Capacity/Lit', tracking=True)
+    tank_size = fields.Float(string=' Fuel Tank Capacity/Lit', tracking=True)
     site_type_id = fields.Many2one('site.type', string='Site Type', tracking=True)
     group = fields.Selection([('data_center', 'Data Center'), ('major', 'Major'), ('normal', 'Normal')], string='Group',
                              default='data_center', tracking=True)
-    reservation_liters = fields.Integer(string='Reservation Liters', tracking=True, default=_get_reservation_liters)
+    reservation_liters = fields.Float(string='Reservation Liters', tracking=True, default=_get_reservation_liters)
     owner_name = fields.Char(string='Owner Name', tracking=True)
     contract_id = fields.Char(string='Contract ID', tracking=True)
     payment_type = fields.Selection([('month', 'Month'), ('year', 'Year')], string='Payment Type', default='month',

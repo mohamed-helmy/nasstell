@@ -21,7 +21,7 @@ class GeneratorPlanning(models.Model):
 
     generator_ids = fields.Many2many(comodel_name="site.generator", required=True, ondelete="cascade")
     maintenance_team_id = fields.Many2one(comodel_name="maintenance.team", required=True, domain=_get_generator_teams)
-    site_name = fields.Char(string='Site Name')
+    site_name = fields.Char(string='Site Name', related='site_id.name')
     planning_lines_ids = fields.One2many(comodel_name="generator.planning.line", inverse_name="plan_id")
 
     recurring_rule_type = fields.Selection([('daily', 'Days'), ('weekly', 'Weeks'),
@@ -215,7 +215,7 @@ class GeneratorPlanningLine(models.Model):
     _rec_name = 'plan_id'
 
     site_id = fields.Many2one(comodel_name="maintenance.equipment", related='plan_id.site_id', store=1)
-    site_name = fields.Char(string='Site Name')
+    site_name = fields.Char(string='Site Name', related='site_id.name')
     plan_id = fields.Many2one(comodel_name="generator.planning", required=True, ondelete="cascade")
     maintenance_request_id = fields.Many2one(comodel_name="maintenance.request")
     planned_generator_ids = fields.Many2many("site.generator", related='plan_id.generator_ids')

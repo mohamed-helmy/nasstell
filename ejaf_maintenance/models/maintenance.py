@@ -50,7 +50,7 @@ class Maintenance(models.Model):
     outage_duration_str = fields.Char(string="Outage duration", compute="_get_outage_duration", store=True)
     duration_str = fields.Char(string="duration", compute="_get_duration_str", store=True, copy=False)
     alarm_description = fields.Text(string="Alarm description")
-    route_cause = fields.Text(string="Route cause")
+    route_cause = fields.Text(string="Root")
     nmc_comment = fields.Html(string="NMC Comment")
     outage_category_id = fields.Many2one(comodel_name="outage.category", string="Outage Category")
     job_order_ids = fields.One2many(comodel_name="maintenance.job.order", inverse_name="maintenance_id")
@@ -77,6 +77,14 @@ class Maintenance(models.Model):
     is_team_leader = fields.Boolean(string="", compute='_cheeck_team_leader')
     maintenance_team_id = fields.Many2one(comodel_name="maintenance.team", required=False, )
     technical_inspection_ids = fields.One2many('technical.inspection', 'maintenance_id', string='Technical Inspections')
+
+
+    @api.model
+    def create(self, values):
+        draft_stage = self.env['maintenance.stage'].sudo().search([('name', '=', 'New Request')])
+        values['stage_id'] =  draft_stage.id        
+        return super(Maintenance, self).create(values)
+
 
     @api.onchange('kanban_state')
     def _check_maintenance_state(self):

@@ -98,25 +98,26 @@ class MaintenanceRequest(models.Model):
     remark = fields.Char(string='Remark')
 
     # fuel fields
-    g1rh = fields.Integer(string='G1RH')
-    g1rh_analysis = fields.Integer(string='G1RH', compute='calc_g1_rh')
-    g2rh = fields.Integer(string='G2RH')
-    g2rh_analysis = fields.Integer(string='G2RH', compute='calc_g2_rh')
-    total_rhs = fields.Integer(compute='calc_total_rhs', string='Total RHs')
-    days = fields.Integer(string='Days', compute='get_days')
+    g1rh = fields.Float(string='G1RH')
+    g1rh_analysis = fields.Float(string='G1RH', compute='calc_g1_rh')
+    g2rh = fields.Float(string='G2RH')
+    g2rh_analysis = fields.Float(string='G2RH', compute='calc_g2_rh')
+    total_rhs = fields.Float(compute='calc_total_rhs', string='Total RHs')
+    days = fields.Float(string='Days', compute='get_days')
     liters_per_hour = fields.Float(string='Liters Per Hour', digits=(16, 2), compute='calc_liters_per_hour')
-    tank_size = fields.Integer(string='Tank Size', related='equipment_id.tank_size')
-    remain_letters = fields.Integer(string='Remain Letters in the tank')
-    liters_in_the_tank = fields.Integer(string='Liters in the tank')
+    tank_size = fields.Float(string='Tank Size', related='equipment_id.tank_size')
+    remain_letters = fields.Float(string='Remain Letters in the tank')
+    liters_in_the_tank = fields.Float(string='Liters in the tank')
     c_p_status = fields.Char(string='C.P Status')
-    filling_liters = fields.Integer(string='Filling Liters')
-    total_liters = fields.Integer(compute='get_total', string='Total Liters')
-    rh_per_day = fields.Integer(string='R.H/Day', compute='calc_rh_per_day')
-    reservation_liters = fields.Integer(string='Reservation Liters', related='equipment_id.reservation_liters')
-    available_for_use = fields.Integer(string='Available for Use', compute='calc_available_for_use')
-    remaining_days_before_next_visit = fields.Integer(string='Remaining Days before next visit',
+    filling_liters = fields.Float(string='Filling Liters')
+    total_liters = fields.Float(compute='get_total', string='Total Liters')
+    rh_per_day = fields.Float(string='R.H/Day', compute='calc_rh_per_day')
+    reservation_liters = fields.Float(string='Reservation Liters', related='equipment_id.reservation_liters')
+    available_for_use = fields.Float(string='Available for Use', compute='calc_available_for_use')
+    remaining_days_before_next_visit = fields.Float(string='Remaining Days before next visit',
                                                       compute='calc_remaining_days_before_next_visit')
-    next_visit_plan = fields.Date(string='Next Visit Plan', compute='calc_next_visit_plan')
+    next_visit_plan = fields.Date(string='Next Visit Plan', compute='calc_next_visit_plan', inverse='_set_next_visit_plan')
+    next_visit_plan_temp = fields.Date(string='Next Visit Plan')
 
     @api.depends('g1rh', 'maintenance_type', 'equipment_id', 'maintenance_tag', 'starting_time')
     def calc_g1_rh(self):
@@ -147,10 +148,17 @@ class MaintenanceRequest(models.Model):
     @api.depends('end_time', 'remaining_days_before_next_visit')
     def calc_next_visit_plan(self):
         for request in self:
-            repaired_stage = self.env['maintenance.stage'].sudo().search([('done', '=', True)],limit=1)
-            request.next_visit_plan = (request.end_time + timedelta(
-                days=int(
-                    request.remaining_days_before_next_visit))) if request.end_time and request.stage_id.id == repaired_stage.id else False
+            if request.next_visit_plan_temp:
+                request.next_visit_plan = request.next_visit_plan_temp
+            else:
+                repaired_stage = self.env['maintenance.stage'].sudo().search([('done', '=', True)],limit=1)
+                request.next_visit_plan = (request.end_time + timedelta(
+                    days=int(
+                        request.remaining_days_before_next_visit))) if request.end_time and request.stage_id.id == repaired_stage.id else False
+
+    def _set_next_visit_plan(self):
+        for request in self:
+            request.next_visit_plan_temp = request.next_visit_plan
 
     @api.depends('tank_size', 'remain_letters', 'liters_per_hour', 'rh_per_day')
     def calc_remaining_days_before_next_visit(self):
@@ -283,20 +291,20 @@ class MaintenanceRequest(models.Model):
                     [('type', '=', record.maintenance_tag), ('is_default', '=', True)])
                 record.checklist_ids = [(6, 0, checklists.ids)]
 
-    @api.onchange('maintenance_team_id')
-    def set_responsible(self):
-        for request in self:
-            if request.maintenance_team_id and request.maintenance_team_id.team_leader_id:
-                request.user_id = request.maintenance_team_id.team_leader_id.id
-                user = request.maintenance_team_id.team_leader_id
-                partner_ids = [user.partner_id.id]
-                request.message_notify(
-                    partner_ids=partner_ids,
-                    subject=_('Check the maintenance request [%s] for the planning date %s') % (
-                        request.name, request.request_date),
-                    message_type='email',
-                    subtype='mt_comment',
-                )
+    # @api.onchange('maintenance_team_id')
+    # def set_responsible(self):
+    #     for request in self:
+    #         if request.maintenance_team_id and request.maintenance_team_id.team_leader_id:
+    #             request.user_id = request.maintenance_team_id.team_leader_id.id
+    #             user = request.maintenance_team_id.team_leader_id
+    #             partner_ids = [user.partner_id.id]
+    #             request.message_notify(
+    #                 partner_ids=partner_ids,
+    #                 subject=_('Check the maintenance request [%s] for the planning date %s') % (
+    #                     request.name, request.request_date),
+    #                 message_type='email',
+    #                 subtype='mt_comment',
+    #             )
 
     @api.depends('timer_first_start', 'starting_time')
     def _calc_dates(self):
@@ -320,3 +328,20 @@ class MaintenanceRequest(models.Model):
                         'duration': minutes_spent * 60 / 3600})
         stage = self.env['maintenance.stage'].sudo().search([('name', '=', 'Repaired')])
         self.write({'stage_id': stage.id})
+
+    def write(self, vals):
+        res = super(MaintenanceRequest, self).write(vals)
+        if vals.get('maintenance_team_id', False):
+            for request in self:
+                if request.maintenance_team_id and request.maintenance_team_id.team_leader_id:
+                    request.user_id = request.maintenance_team_id.team_leader_id.id
+                    user = request.maintenance_team_id.team_leader_id
+                    partner_ids = [user.partner_id.id]
+                    request.message_notify(
+                        partner_ids=partner_ids,
+                        subject=_('Check the maintenance request [%s] for the planning date %s') % (
+                            request.name, request.request_date),
+                        message_type='email',
+                        subtype='mt_comment',
+                    )
+        return res

@@ -11,7 +11,7 @@
                         <group>
                             <field name="maintenance_team_id" options="{'no_create': True}"/>
                             <field name="site_id" readonly="1" force_save="1" invisible="1"/>
-                            <field name="site_name" readonly="1" force_save="1"/>
+                            <field name="site_name"/>
                         </group>
                         <group>
                             <div>
@@ -42,7 +42,7 @@
                                         class="oe_highlight"
                                         type="object"
                                         icon="fa-refresh"/>
-                                <field name="planning_lines_ids" context="{'default_site_name':site_name}">
+                                <field name="planning_lines_ids" context="{'default_site_id':site_id}">
                                     <tree editable="bottom">
                                         <field name="site_id" invisible="1"/>
                                         <field name="site_name"/>

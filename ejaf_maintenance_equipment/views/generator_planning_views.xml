@@ -12,7 +12,7 @@
                             <field name="maintenance_team_id"
                                    options="{'no_create': True}"/>
                             <field name="site_id" readonly="1" force_save="1" invisible="1"/>
-                            <field name="site_name" readonly="1" force_save="1"/>
+                            <field name="site_name"/>
                             <field name="generator_ids"
                                    context="{'default_site_id':site_id}"
                                    domain="[('site_id','=',site_id)]"
@@ -186,7 +186,7 @@
                             <group>
                                 <field name="name" required="1"/>
                                 <field name="site_id" force_save="1" invisible="1"/>
-                                <field name="site_name" readonly="1" force_save="1"/>
+                                <field name="site_name"/>
                             </group>
                             <group>
                                 <field name="active" widget="boolean_toggle"/>

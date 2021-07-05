@@ -185,6 +185,15 @@
                 <xpath expr="//button[@name='reset_equipment_request']" position="after">
                     <field name="job_order_count" invisible="1"/>
                 </xpath>
+                <xpath expr="//field[@name='starting_time']" position="attributes">
+                <attribute name="attrs">{'invisible': False}</attribute>
+                </xpath>
+                <xpath expr="//field[@name='end_time']" position="attributes">
+                <attribute name="attrs">{'invisible': False}</attribute>
+                </xpath>
+                <xpath expr="//field[@name='duration_str']" position="attributes">
+                    <attribute name="attrs">{'invisible': False}</attribute>
+                </xpath>
             </field>
         </record>
 

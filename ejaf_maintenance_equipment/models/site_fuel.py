@@ -18,7 +18,7 @@ class FuelPlanning(models.Model):
         return [('id', 'in', teams.ids)]
 
     site_id = fields.Many2one(comodel_name="maintenance.equipment", required=False, ondelete="cascade")
-    site_name = fields.Char(string='Site Name')
+    site_name = fields.Char(string='Site Name', related='site_id.name')
     maintenance_team_id = fields.Many2one(comodel_name="maintenance.team", required=True, domain=_get_fuel_teams)
     planning_lines_ids = fields.One2many(comodel_name="fuel.planning.line", inverse_name="plan_id")
 
@@ -117,14 +117,14 @@ class FuelPlanningLine(models.Model):
     _rec_name = 'plan_id'
 
     site_id = fields.Many2one(comodel_name="maintenance.equipment",related='plan_id.site_id', ondelete="cascade")
-    site_name = fields.Char(string='Site Name')
+    site_name = fields.Char(string='Site Name', related='site_id.name')
     plan_id = fields.Many2one(comodel_name="fuel.planning", required=True, ondelete="cascade")
     maintenance_request_id = fields.Many2one(comodel_name="maintenance.request")
     maintenance_team_id = fields.Many2one(comodel_name="maintenance.team", related='plan_id.maintenance_team_id',
                                           store=1)
     date = fields.Date(string='Plan For next Visit')
     actual_date = fields.Date(string='Actual Date', related='maintenance_request_id.starting_time_date')
-    remain_letters_in_the_tank = fields.Integer(string='Remain Letters In The Tank')
+    remain_letters_in_the_tank = fields.Float(string='Remain Letters In The Tank', related='maintenance_request_id.remain_letters')
     date_edit_mode = fields.Boolean()
 
 

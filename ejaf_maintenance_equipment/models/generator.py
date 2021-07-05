@@ -17,9 +17,9 @@ class SiteGenerator(models.Model):
 
     name = fields.Char(string='Name', required=True)
     site_id = fields.Many2one('maintenance.equipment')
-    site_name = fields.Char(string='Site Name')
+    site_name = fields.Char(string='Site Name', related='site_id.name')
     install_date = fields.Integer(string="Install Date(years)")
-    kva = fields.Integer(string="Capacity (KVA)")
+    kva = fields.Float(string="Capacity (KVA)")
     brand = fields.Char(string="GENERATOR BRAND")
     status = fields.Char(string="Status")
     working_hours = fields.Integer(string="Working Hours")

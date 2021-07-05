@@ -233,7 +233,8 @@
                                 <field name="ac_brand"/>
                             </group>
                             <group>
-                                <field name="site_name" readonly="1" force_save="1"/>
+                                <field name="site_id" invisible="1"/>
+                                <field name="site_name"/>
                                 <field name="ac_capacity"/>
                             </group>
                         </group>
@@ -293,7 +294,7 @@
                         <notebook>
                             <page name="child_ids" string="Related Sites">
                                 <field name="child_ids"
-                                       domain="[('parent_id','=',active_id)]"
+                                       domain="[('id','!=',active_id)]"
                                        mode="kanban"
                                        context="{'default_parent_id': active_id, 'kanban_view_ref': 'maintenance.hr_equipment_view_kanban'}"/>
 
@@ -382,7 +383,7 @@
 
                                 </field>
                             </page>
-                            <page string="Predictive Maintenance Plan for Generators" name="planning-generators">
+                            <page string="PPN" name="planning-generators">
                                 <field name="generator_planning_ids"
                                        context="{'default_site_id':active_id}">
                                     <kanban class="o_res_partner_kanban">
@@ -413,7 +414,7 @@
                                     <field name="accu_board_availability"/>
                                 </group>
 
-                                <field name="air_condition_ids" context="{'default_site_name':name}">
+                                <field name="air_condition_ids" context="{'default_site_id':active_id}">
                                     <kanban class="o_res_partner_kanban">
                                         <field name="name"/>
                                         <field name="ac_capacity"/>
@@ -442,7 +443,7 @@
                                 </field>
 
                             </page>
-                            <page string="Predictive Maintenance Plan for full site" name="planning">
+                            <page string="PN" name="planning">
                                 <field name="last_pred_maintenance_request_date" invisible="1"/>
                                 <field name="planning_ids"
                                        context="{'default_site_id':active_id, 'default_date_start': last_pred_maintenance_request_date}">
@@ -462,6 +463,24 @@
                                     </kanban>
                                 </field>
                             </page>
+                             <page string="Guard Info">
+                                <group>
+                                    <field name="guard"/>
+                                    <field name="number_of_guards"/>
+                                    <field name="grounding_system_according_korek_specs"/>
+
+                                    <field name="guard_ids" attrs="{'invisible':[('guard','!=','yes')]}">
+                                        <tree editable="bottom">
+                                            <field name="name" required="1"/>
+                                            <field name="phone"/>
+                                            <field name="salary"/>
+                                            <field name="currency_id"/>
+                                        </tree>
+                                    </field>
+                                </group>
+
+                            </page>
+
                             <page string="Detailed Information" name="detailed_information">
                                 <group>
                                     <group>
@@ -625,20 +644,6 @@
                                         <field name="payment_amount"/>
                                         <field name="id_of_payment"/>
                                     </group>
-                                </group>
-                                <group name="guard_info" string="Guard Info">
-                                    <field name="guard"/>
-                                    <field name="number_of_guards"/>
-                                    <field name="grounding_system_according_korek_specs"/>
-
-                                    <field name="guard_ids" attrs="{'invisible':[('guard','!=','yes')]}">
-                                        <tree editable="bottom">
-                                            <field name="name" required="1"/>
-                                            <field name="phone"/>
-                                            <field name="salary"/>
-                                            <field name="currency_id"/>
-                                        </tree>
-                                    </field>
                                 </group>
                                 <group name="electric_info" string="Electric Info">
                                     <group>
