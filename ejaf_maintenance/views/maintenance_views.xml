@@ -61,15 +61,20 @@
                     <attribute name="required">1</attribute>
                 </field>
                 <field name="email_cc" position="after">
-                    <field name="starting_time"
-                           attrs="{'invisible':[('maintenance_type','!=','preventive')]}"/>
-                    <field name="end_time" attrs="{'invisible':[('maintenance_type','!=','preventive')]}"/>
-                    <field name="duration_str" attrs="{'invisible':[('maintenance_type','!=','preventive')]}"/>
+                    <field name="starting_time"/>
+                    <field name="end_time"/>
+
+                    <label for="duration_str"/>
+                    <div>
+                        <field name="duration_str" class="oe_inline"/>
+                        <button type='object' class="fa fa-arrow-right oe_link" name="button_open_request_timeline" string="Timeline" attrs="{'invisible': [('maintenance_type', 'not in', ['corrective', 'preventive'])]}"/>
+                    </div>
+
                     <field name="is_team_leader" invisible="1"/>
                 </field>
-                <xpath expr="//field[@name='kanban_state']" position="attributes">
-                    <attribute name="attrs">{'invisible': [('is_team_leader', '!=', True)]}</attribute>
-                </xpath>
+<!--                <xpath expr="//field[@name='kanban_state']" position="attributes">-->
+<!--                    <attribute name="class">oe_read_only</attribute>-->
+<!--                </xpath>-->
                 <field name="category_id" position="attributes">
                     <attribute name="invisible">1</attribute>
                 </field>
@@ -185,15 +190,6 @@
                 <xpath expr="//button[@name='reset_equipment_request']" position="after">
                     <field name="job_order_count" invisible="1"/>
                 </xpath>
-                <xpath expr="//field[@name='starting_time']" position="attributes">
-                <attribute name="attrs">{'invisible': False}</attribute>
-                </xpath>
-                <xpath expr="//field[@name='end_time']" position="attributes">
-                <attribute name="attrs">{'invisible': False}</attribute>
-                </xpath>
-                <xpath expr="//field[@name='duration_str']" position="attributes">
-                    <attribute name="attrs">{'invisible': False}</attribute>
-                </xpath>
             </field>
         </record>
 
@@ -211,5 +207,27 @@
                   name="Problem Category"
                   parent="maintenance.menu_maintenance_configuration"
                   action="problem_category_action"/>
+
+        <record id="maintenance_request_timeline_tree_view" model="ir.ui.view">
+            <field name="name">maintenance.request.timeline.tree.view</field>
+            <field name="model">maintenance.request.timeline</field>
+            <field name="arch" type="xml">
+                <tree create="0" delete="0" editable="top">
+                    <field name="maintenance_request_id" invisible="1"/>
+                    <field name="start_time"/>
+                    <field name="end_time"/>
+                    <field name="duration_str"/>
+                    <field name="duration" widget="float_time" sum="Total Duration" optional="hide"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="maintenance_request_timeline_action" model="ir.actions.act_window">
+            <field name="name">Maintenance Request Timeline</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">maintenance.request.timeline</field>
+            <field name="view_mode">tree</field>
+        </record>
+
     </data>
 </odoo>

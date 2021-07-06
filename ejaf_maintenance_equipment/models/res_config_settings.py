@@ -19,7 +19,7 @@ class ResConfigSettings(models.TransientModel):
         res = super(ResConfigSettings, self).get_values()
         params = self.env['ir.config_parameter'].sudo()
         res.update(
-            reservation_liters=int(params.get_param('reservation_liters'))
+            reservation_liters=float(params.get_param('reservation_liters'))
         )
         return res
 

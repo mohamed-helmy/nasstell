@@ -49,13 +49,13 @@
                             name="action_timer_start"
                             type="object"
                             string="Start"
-                            attrs="{'invisible': [('timer_start', '!=', False)]}"/>
+                            attrs="{'invisible': [('timer_started', '=', True)]}"/>
 
                     <button class="btn-primary btn-danger o_fsm_stop"
                             name="action_timer_stop"
                             type="object"
                             string="Stop"
-                            attrs="{'invisible': [('timer_last_stop', '!=', False)]}"/>
+                            attrs="{'invisible': ['|', ('timer_started', '=', False), ('timer_stopped', '=', True)]}"/>
                 </xpath>
 
                 <xpath expr="//field[@name='stage_id']" position="attributes">
@@ -68,6 +68,8 @@
                            class="text-danger ml-auto h2 ml-4 font-weight-bold"/>
                 </xpath>
                 <field name="schedule_date" position="after">
+                    <field name="timer_started" invisible="1"/>
+                    <field name="timer_stopped" invisible="1"/>
                     <field name="timer_first_start" invisible="1"/>
                     <field name="timer_last_stop" force_save="1" invisible="0"/>
                     <field name="starting_time_date" invisible="1"/>
@@ -383,7 +385,7 @@
 
                                 </field>
                             </page>
-                            <page string="PPN" name="planning-generators">
+                            <page string="PPM" name="planning-generators">
                                 <field name="generator_planning_ids"
                                        context="{'default_site_id':active_id}">
                                     <kanban class="o_res_partner_kanban">
@@ -443,7 +445,7 @@
                                 </field>
 
                             </page>
-                            <page string="PN" name="planning">
+                            <page string="PM" name="planning">
                                 <field name="last_pred_maintenance_request_date" invisible="1"/>
                                 <field name="planning_ids"
                                        context="{'default_site_id':active_id, 'default_date_start': last_pred_maintenance_request_date}">

@@ -118,6 +118,8 @@ class MaintenanceRequest(models.Model):
                                                       compute='calc_remaining_days_before_next_visit')
     next_visit_plan = fields.Date(string='Next Visit Plan', compute='calc_next_visit_plan', inverse='_set_next_visit_plan')
     next_visit_plan_temp = fields.Date(string='Next Visit Plan')
+    timer_started = fields.Boolean()
+    timer_stopped = fields.Boolean()
 
     @api.depends('g1rh', 'maintenance_type', 'equipment_id', 'maintenance_tag', 'starting_time')
     def calc_g1_rh(self):
@@ -314,6 +316,8 @@ class MaintenanceRequest(models.Model):
 
     def action_timer_start(self):
         self.ensure_one()
+        self.timer_started = True
+        self.timer_stopped = False
         if not self.timer_first_start:
             self.write({'timer_first_start': fields.Datetime.now()})
         stage = self.env['maintenance.stage'].sudo().search([('name', '=', 'In Progress')])
@@ -321,6 +325,7 @@ class MaintenanceRequest(models.Model):
 
     def action_timer_stop(self):
         self.ensure_one()
+        self.timer_stopped = True
         start_time = self.timer_start
         if start_time:  # timer was either running or paused
             minutes_spent = round((fields.Datetime.now() - start_time).total_seconds() / 60, 2)
@@ -328,6 +333,14 @@ class MaintenanceRequest(models.Model):
                         'duration': minutes_spent * 60 / 3600})
         stage = self.env['maintenance.stage'].sudo().search([('name', '=', 'Repaired')])
         self.write({'stage_id': stage.id})
+
+    def reset_equipment_request(self):
+        res = super(MaintenanceRequest, self).reset_equipment_request()
+        self.write({
+            'timer_started': False,
+            'timer_stopped': False,
+        })
+        return res
 
     def write(self, vals):
         res = super(MaintenanceRequest, self).write(vals)

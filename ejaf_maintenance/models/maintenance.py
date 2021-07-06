@@ -22,6 +22,49 @@ class ProblemCategory(models.Model):
         default='fiber', string='Type')
 
 
+class MaintenanceRequestTimeline(models.Model):
+    _name = 'maintenance.request.timeline'
+    _description = 'Maintenance Request Timeline'
+
+    start_time = fields.Datetime(string="Start Time", required=1)
+    end_time = fields.Datetime(string="End Time")
+    duration = fields.Float(string="Duration (hours)", compute='_get_duration', store=1)
+    duration_str = fields.Char(string="Duration",  compute='_get_duration', store=1)
+    maintenance_request_id = fields.Many2one('maintenance.request', string='Maintenance Request', required=True)
+
+    @api.constrains('start_time', 'end_time')
+    def check_time(self):
+        for rec in self:
+            if rec.start_time and rec.end_time:
+                if rec.end_time < rec.start_time:
+                    raise ValidationError(_("Start time should be prior to end time."))
+
+    @api.depends('start_time', 'end_time')
+    def _get_duration(self):
+        for rec in self:
+            if not rec.start_time or not rec.end_time:
+                rec.duration = 0
+                rec.duration_str = '00:00:00'
+            else:
+                timedelta = rec.end_time - rec.start_time
+                timedelta_in_seconds = timedelta.days * 24 * 3600 + timedelta.seconds
+                minutes, seconds = divmod(timedelta_in_seconds, 60)
+                hours, minutes = divmod(minutes, 60)
+                days, hours = divmod(hours, 24)
+
+                hours = str(int(hours)) if hours else '00'
+                minutes = str(int(minutes)) if minutes else '00'
+                seconds = str(int(seconds)) if seconds else '00'
+                hours_str = '0' + hours if len(hours) == 1 else hours
+                minutes_str = '0' + minutes if len(minutes) == 1 else minutes
+                seconds_str = '0' + seconds if len(seconds) == 1 else seconds
+                duration_str = hours_str + ':' + minutes_str + ':' + seconds_str
+                if days:
+                    duration_str = str(days) + ' days / ' + duration_str
+                rec.duration_str = duration_str
+                rec.duration = timedelta_in_seconds / 3600
+
+
 class Maintenance(models.Model):
     _inherit = 'maintenance.request'
 
@@ -77,6 +120,7 @@ class Maintenance(models.Model):
     is_team_leader = fields.Boolean(string="", compute='_cheeck_team_leader')
     maintenance_team_id = fields.Many2one(comodel_name="maintenance.team", required=False, )
     technical_inspection_ids = fields.One2many('technical.inspection', 'maintenance_id', string='Technical Inspections')
+    request_timeline_ids = fields.One2many('maintenance.request.timeline', 'maintenance_request_id', string='Timeline')
 
 
     @api.model
@@ -94,7 +138,12 @@ class Maintenance(models.Model):
             if request.kanban_state in ['normal', 'blocked']:
                 in_progress_stage = self.env['maintenance.stage'].sudo().search([('name', '=', 'In Progress')])
                 draft_stage = self.env['maintenance.stage'].sudo().search([('name', '=', 'New Request')])
-                request.stage_id = in_progress_stage.id if request.kanban_state == 'normal' else draft_stage.id
+                if request._origin and request.kanban_state == 'normal':
+                    request.stage_id = in_progress_stage.id
+                else:
+                    request.stage_id = draft_stage.id
+                    request.timer_started = False
+                    request.timer_stopped = False
                 if request.technical_inspection_ids:
                     technical_inspections = self.env['technical.inspection'].sudo().browse(
                         request.technical_inspection_ids._origin.ids)
@@ -144,12 +193,29 @@ class Maintenance(models.Model):
 
     def action_timer_start(self):
         self.ensure_one()
-        if self.kanban_state != 'blocked':
-            super(Maintenance, self).action_timer_start()
-            self.write({'tt_status': 'in_progress', 'starting_outage_time': fields.Datetime.now(),
-                        'starting_time': fields.Datetime.now()})
-        else:
-            self.write({'tt_status': 'in_progress','timer_start': fields.Datetime.now()})
+        # if self.kanban_state != 'blocked':
+        super(Maintenance, self).action_timer_start()
+        now = fields.Datetime.now()
+        vals = {'tt_status': 'in_progress'}
+        if not self.starting_time:
+            vals.update({
+                'starting_time': now
+            })
+        if not self.starting_outage_time:
+            vals.update({
+                'starting_outage_time': now
+            })
+        if not self.timer_start:
+            vals.update({
+                'timer_start': now
+            })
+        self.write(vals)
+        self.env['maintenance.request.timeline'].create({
+            'maintenance_request_id': self.id,
+            'start_time': now
+        })
+        # else:
+        #     self.write({'tt_status': 'in_progress','timer_start': fields.Datetime.now()})
 
     def action_timer_stop(self):
         self.ensure_one()
@@ -176,8 +242,20 @@ class Maintenance(models.Model):
         super(Maintenance, self).action_timer_stop()
         start_time = self.timer_start
         if start_time:  # timer was either running or paused
-            self.write({'closing_outage_time': fields.Datetime.now(), 'tt_status': 'closed',
-                        'end_time': fields.Datetime.now()})
+            now = fields.Datetime.now()
+            self.write({'closing_outage_time': now, 'tt_status': 'closed',
+                        'end_time': now})
+            last_timeline = self.env['maintenance.request.timeline'].search([('maintenance_request_id', '=', self.id), ('end_time', '=', False)], limit=1)
+            if last_timeline:
+                last_timeline.write({
+                    'end_time': now,
+                })
+            else:
+                self.env['maintenance.request.timeline'].create({
+                    'maintenance_request_id': self.id,
+                    'start_time': now,
+                    'end_time': now,
+                })
 
     @api.depends('job_order_ids')
     def _compute_job_order_count(self):
@@ -206,12 +284,16 @@ class Maintenance(models.Model):
             minutes_str = '0' + minutes if len(minutes) == 1 else minutes
             seconds_str = '0' + seconds if len(seconds) == 1 else seconds
             record.outage_duration_str = hours_str + ':' + minutes_str + ':' + seconds_str
-            record.in_vol = record.outage_duration
 
-    @api.depends('starting_time', 'end_time')
+    @api.depends('starting_time', 'end_time', 'maintenance_type')
     def _get_duration_str(self):
         for record in self:
-            duration_seconds = record._get_duration(record.starting_time, record.end_time)
+            if record.maintenance_type in ['corrective', 'preventive']:
+                duration_seconds = 0
+                for line in record.request_timeline_ids:
+                    duration_seconds += record._get_duration(line.start_time, line.end_time)
+            else:
+                duration_seconds = record._get_duration(record.starting_time, record.end_time)
             hour = duration_seconds // 3600
             duration_seconds %= 3600
             duration_minutes = duration_seconds // 60
@@ -248,6 +330,15 @@ class Maintenance(models.Model):
                 "res_id": maintenance_inspection[0].id if maintenance_inspection else False,
                 'context': {'create': False},
             }
+
+    def button_open_request_timeline(self):
+        self.ensure_one()
+        return {
+            "type": "ir.actions.act_window",
+            "res_model": "maintenance.request.timeline",
+            "views": [[self.env.ref('ejaf_maintenance.maintenance_request_timeline_tree_view').id, "tree"]],
+            "domain": [('id', 'in', self.request_timeline_ids.ids)],
+        }
 
 
 def action_create_job_order(self):

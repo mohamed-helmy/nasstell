@@ -7,4 +7,5 @@ access_spare_part,spare_part,model_spare_part,,1,1,1,1
 access_maintenance_work_done,maintenance_work_done,model_maintenance_work_done,,1,1,1,1
 access_maintenance_job_order,maintenance_job_order,model_maintenance_job_order,,1,1,1,1
 access_technical_inspection,technical_inspection,model_technical_inspection,,1,1,1,1
+access_maintenance_request_timeline,maintenance_request_timeline,model_maintenance_request_timeline,,1,1,1,1
 
