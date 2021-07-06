@@ -33,7 +33,7 @@ class JobOrder(models.Model):
                                                         ('inspection', 'inspection'),
                                                         ('repairing', 'repairing'),
                                                         ('done', 'done')
-                                                        ], default='draft', track_visibility='always')
+                                                        ], default='draft', tracking=True)
 
     sp_replaced = fields.Char(string="S.P. Replaced/which management")
     sla = fields.Char(string="SLA")

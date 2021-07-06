@@ -38,36 +38,52 @@ class MaintenanceRequest(models.Model):
     material_request_count = fields.Integer(compute='calc_material_requests')
     returned_material_request_count = fields.Integer(compute='calc_returned_material_requests')
 
-    @api.depends('material_request_ids')
+    @api.depends('material_request_line_ids')
     def get_actual_material_used(self):
+        actual_lines = []
         for req in self:
-            actual_lines = []
-            products = []
-            data = []
-            returned_serials = []
-            if req.material_request_ids:
-                for material in req.material_request_ids.filtered(lambda mm: mm.state == 'transferred' and mm.line_ids):
-                    for line in material.line_ids.filtered(
-                            lambda ll: ll.returned and ll.lot_id.id not in returned_serials):
-                        returned_serials.append(line.lot_id.id)
-
-            if req.material_request_ids:
-                for material in req.material_request_ids.filtered(lambda mm: mm.state == 'transferred' and mm.line_ids):
-                    for line in material.line_ids.filtered(lambda ll: not ll.returned):
-                        move_line = material.picking_id.move_line_ids_without_package.filtered(lambda
-                                                                                                   ll: ll.product_id.id == line.product_id.id and ll.picking_id.id == material.picking_id.id)
-                        if move_line and move_line[0].lot_id and move_line[0].lot_id.id not in returned_serials:
-                            created_obj = self.env['actual.material.used'].sudo().create({
-                                'product_id': line.product_id.id,
-                                'actual_qty': line.qty,
-                                'actual_serials': move_line[0].lot_id.name if move_line and move_line[0].lot_id else '',
-                                'actual_product_status': move_line[0].product_status if move_line and move_line[
-                                    0].product_status else '',
-                                'actual_uom': move_line[0].product_uom_id.name if move_line and move_line[
-                                    0].product_uom_id else '',
-                            })
-                            actual_lines.append(created_obj.id)
+            if req.material_request_line_ids:
+                for line in req.material_request_line_ids:
+                    if line.requested_qty > line.returned_qty and line.requested_serials == line.returned_serials:
+                        created_obj = self.env['actual.material.used'].sudo().create({
+                            'product_id': line.product_id.id,
+                            'actual_qty': line.requested_qty - line.returned_qty,
+                            'actual_serials': line.requested_serials,
+                            'actual_product_status': line.requested_product_status,
+                            'actual_uom': line.requested_uom,
+                        })
+                        actual_lines.append(created_obj.id)
             req.actual_material_used_ids = actual_lines
+
+
+# @api.depends('material_request_ids')
+# def get_actual_material_used(self):
+#     for req in self:
+#         actual_lines = []
+#         returned_serials = []
+#         if req.material_request_ids:
+#             for material in req.material_request_ids.filtered(lambda mm: mm.state == 'transferred' and mm.line_ids):
+#                 for line in material.line_ids.filtered(
+#                         lambda ll: ll.returned and ll.lot_id.id not in returned_serials):
+#                     returned_serials.append(line.lot_id.id)
+#
+#         if req.material_request_ids:
+#             for material in req.material_request_ids.filtered(lambda mm: mm.state == 'transferred' and mm.line_ids):
+#                 for line in material.line_ids.filtered(lambda ll: not ll.returned):
+#                     move_line = material.picking_id.move_line_ids_without_package.filtered(lambda
+#                                                                                                ll: ll.product_id.id == line.product_id.id and ll.picking_id.id == material.picking_id.id)
+#                     if move_line and move_line[0].lot_id and move_line[0].lot_id.id not in returned_serials:
+#                         created_obj = self.env['actual.material.used'].sudo().create({
+#                             'product_id': line.product_id.id,
+#                             'actual_qty': line.qty,
+#                             'actual_serials': move_line[0].lot_id.name if move_line and move_line[0].lot_id else '',
+#                             'actual_product_status': move_line[0].product_status if move_line and move_line[
+#                                 0].product_status else '',
+#                             'actual_uom': move_line[0].product_uom_id.name if move_line and move_line[
+#                                 0].product_uom_id else '',
+#                         })
+#                         actual_lines.append(created_obj.id)
+#         req.actual_material_used_ids = actual_lines
 
     @api.depends('material_request_ids')
     def get_material_lines(self):
@@ -104,50 +120,16 @@ class MaintenanceRequest(models.Model):
                             data[line.product_id.id] = product_data
                         else:
                             for stock_move_line in stock_move_lines:
-                                data[line.product_id.id].append({'requested': stock_move_line.qty_done,
-                                                     'requested_serial': stock_move_line.lot_id.name if stock_move_line and stock_move_line.lot_id else '',
-                                                     'requested_product_status': stock_move_line.product_status if stock_move_line and stock_move_line.product_status else '',
-                                                     'requested_uom': stock_move_line.product_uom_id.name if stock_move_line and stock_move_line.product_uom_id else '',
-                                                     'returned': 0,
-                                                     'returned_serial': '',
-                                                     'returned_uom': '',
-                                                     'returned_product_status': ''})
-                            # if not line.returned:
-                                # for element in data[line.product_id.id]:
-                                    # if element['requested'] > 0:
-                                        # for stock_move_line in stock_move_lines:
-                                        #     element['requested'] += stock_move_line.qty_done
-                                            # if stock_move_line and stock_move_line[0].lot_id and stock_move_line[
-                                            #     0].lot_id.name not in \
-                                            #         element['requested_serial']:
-                                            #     element[
-                                            #         'requested_serial'] += ',' + stock_move_line[
-                                            #         0].lot_id.name if stock_move_line and stock_move_line[0].lot_id else ''
-                                            # if stock_move_line and stock_move_line[0].product_uom_id and stock_move_line[
-                                            #     0].product_uom_id.name not in \
-                                            #         element['requested_uom']:
-                                            #     element[
-                                            #         'requested_uom'] += ',' + stock_move_line[
-                                            #         0].product_uom_id.name if stock_move_line and stock_move_line[
-                                            #         0].product_uom_id else ''
-                                            # if stock_move_line and stock_move_line[0].lot_id and stock_move_line[
-                                            #     0].product_status not in \
-                                            #         element['requested_product_status']:
-                                            #     element[
-                                            #         'requested_product_status'] += ',' + stock_move_line[
-                                            #         0].product_status if stock_move_line and stock_move_line[
-                                            #         0].product_status else ''
+                                if not line.returned:
+                                    data[line.product_id.id].append({'requested': stock_move_line.qty_done,
+                                                                     'requested_serial': stock_move_line.lot_id.name if stock_move_line and stock_move_line.lot_id else '',
+                                                                     'requested_product_status': stock_move_line.product_status if stock_move_line and stock_move_line.product_status else '',
+                                                                     'requested_uom': stock_move_line.product_uom_id.name if stock_move_line and stock_move_line.product_uom_id else '',
+                                                                     'returned': 0,
+                                                                     'returned_serial': '',
+                                                                     'returned_uom': '',
+                                                                     'returned_product_status': ''})
                             if line.returned:
-                                # if data[line.product_id.id][0][
-                                #     'returned_uom'] and stock_move_line and stock_move_line.product_uom_id.name not in \
-                                #         data[line.product_id.id][0]['returned_uom']:
-                                #     data[line.product_id.id][0][
-                                #         'returned_uom'] += ',' + stock_move_line[0].product_uom_id.name
-                                # else:
-                                #     data[line.product_id.id][0][
-                                #         'returned_uom'] = stock_move_line[0].product_uom_id.name if stock_move_line and \
-                                #                                                                     stock_move_line[
-                                #                                                                         0].product_uom_id else ''
                                 for stock_move_line in stock_move_lines:
                                     if stock_move_line and stock_move_line.lot_id.name in \
                                             data[line.product_id.id][0][
@@ -176,10 +158,10 @@ class MaintenanceRequest(models.Model):
                                             'requested_uom': '',
                                             'returned': stock_move_line.qty_done,
                                             'returned_serial': stock_move_line.lot_id.name if stock_move_line and
-                                                                                                 stock_move_line.lot_id else '',
+                                                                                              stock_move_line.lot_id else '',
                                             'returned_product_status': stock_move_line.product_status if stock_move_line and stock_move_line.product_status else '',
                                             'returned_uom': stock_move_line.product_uom_id.name if stock_move_line and
-                                                                          stock_move_line.product_uom_id else ''
+                                                                                                   stock_move_line.product_uom_id else ''
                                         })
             for key, value in data.items():
                 for item in value:
@@ -196,9 +178,12 @@ class MaintenanceRequest(models.Model):
                     material_lines.append(created_obj.id)
             req.material_request_line_ids = material_lines
 
+
     def calc_material_requests(self):
         for maintenance in self:
-            maintenance.material_request_count = len(maintenance.material_request_ids.filtered(lambda m: not m.returned))
+            maintenance.material_request_count = len(
+                maintenance.material_request_ids.filtered(lambda m: not m.returned))
+
 
     def action_view_material_requests(self):
         return {
@@ -214,8 +199,10 @@ class MaintenanceRequest(models.Model):
             'context': {'default_maintenance_request_id': self.id, 'default_returned': False}
         }
 
+
     def calc_returned_material_requests(self):
         self.returned_material_request_count = len(self.material_request_ids.filtered(lambda m: m.returned))
+
 
     def action_view_returned_material_requests(self):
         return {
@@ -230,6 +217,7 @@ class MaintenanceRequest(models.Model):
             'domain': [('maintenance_request_id', '=', self.id), ('returned', '=', True)],
             'context': {'default_maintenance_request_id': self.id, 'default_returned': True}
         }
+
 
     def action_timer_stop(self):
         self.ensure_one()

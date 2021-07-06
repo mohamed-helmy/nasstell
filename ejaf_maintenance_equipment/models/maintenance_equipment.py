@@ -58,7 +58,7 @@ class MaintenanceEquipment(models.Model):
     _inherit = 'maintenance.equipment'
 
     def _get_reservation_liters(self):
-        reservation_liters = int(self.env['ir.config_parameter'].sudo().get_param('reservation_liters'))
+        reservation_liters = float(self.env['ir.config_parameter'].sudo().get_param('reservation_liters'))
         return reservation_liters
 
     site = fields.Char(string="Code", tracking=True)

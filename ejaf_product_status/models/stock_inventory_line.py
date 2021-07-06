@@ -11,9 +11,8 @@ class StockInventoryLine(models.Model):
 
     @api.onchange('prod_lot_id')
     def _set_product_status(self):
-        for line in self:
-            if line.prod_lot_id and line.prod_lot_id.product_status:
-                line.product_status = line.prod_lot_id.product_status
+        if self.prod_lot_id and self.prod_lot_id.product_status:
+            self.product_status = self.prod_lot_id.product_status
 
 
 class StockInventory(models.Model):

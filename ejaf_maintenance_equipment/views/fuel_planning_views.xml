@@ -31,6 +31,7 @@
                                     <tree editable="bottom">
                                         <field name="site_id" invisible="1"/>
                                         <field name="site_name"/>
+                                        <field name="next_visit_plan" invisible="1"/>
                                         <field name="date"/>
                                         <field name="actual_date"/>
                                         <field name="remain_letters_in_the_tank"/>

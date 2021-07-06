@@ -53,6 +53,16 @@ class TechnicalInspectionReportXlsx(models.AbstractModel):
             'bold': 1,
 
         })
+        true_format = workbook.add_format({
+            'align': 'center',
+            'valign': 'vcenter',
+            'color': 'black',
+            'font_size': 11,
+            'color': 'blue',
+            'border': 1,
+            'bold': 1,
+
+        })
 
         header_format3 = workbook.add_format({
             'align': 'center',
@@ -98,11 +108,23 @@ class TechnicalInspectionReportXlsx(models.AbstractModel):
         col = 0
         for line in objects.question_line_ids:
             sheet.write(row, col, line.checklist_question_id.display_name or "", center_format)
-            sheet.write(row, col + 1, str(line.yes_answer) or "X", center_format)
+            if line.yes_answer == True:
+                sheet.write(row, col + 1, "True", true_format)
+            else:
+                sheet.write(row, col + 1, "X", center_format)
+            if line.na_answer == True:
+                sheet.write(row, col + 2, "True" or "", true_format)
+            else:
+                sheet.write(row, col + 2, "X" or "", center_format)
+            if line.no_ok_answer:
+                sheet.write(row, col + 3, "True", true_format)
+            else:
+                sheet.write(row, col + 3, "X" or "", center_format)
+            if line.na_answer:
+                sheet.write(row, col + 4, "True", true_format)
+            else:
 
-            sheet.write(row, col + 2, str(line.no_answer) or 'X' or "", center_format)
-            sheet.write(row, col + 3, str(line.no_ok_answer) or "X", center_format)
-            sheet.write(row, col + 4, str(line.na_answer) or "X", center_format)
+                sheet.write(row, col + 4, "X", center_format)
 
             sheet.write(row, col + 5, line.comment or "", center_format)
 

@@ -115,8 +115,9 @@ class MaintenanceRequest(models.Model):
     reservation_liters = fields.Float(string='Reservation Liters', related='equipment_id.reservation_liters')
     available_for_use = fields.Float(string='Available for Use', compute='calc_available_for_use')
     remaining_days_before_next_visit = fields.Float(string='Remaining Days before next visit',
-                                                      compute='calc_remaining_days_before_next_visit')
-    next_visit_plan = fields.Date(string='Next Visit Plan', compute='calc_next_visit_plan', inverse='_set_next_visit_plan')
+                                                    compute='calc_remaining_days_before_next_visit')
+    next_visit_plan = fields.Date(string='Next Visit Plan', compute='calc_next_visit_plan',
+                                  inverse='_set_next_visit_plan')
     next_visit_plan_temp = fields.Date(string='Next Visit Plan')
     timer_started = fields.Boolean()
     timer_stopped = fields.Boolean()
@@ -125,12 +126,12 @@ class MaintenanceRequest(models.Model):
     def calc_g1_rh(self):
         for request in self:
             request.g1rh_analysis = 0
-            repaired_stage = self.env['maintenance.stage'].sudo().search([('done', '=', True)],limit=1)
+            repaired_stage = self.env['maintenance.stage'].sudo().search([('done', '=', True)], limit=1)
             if request.g1rh and request.maintenance_type and request.maintenance_type == 'preventive' and request.maintenance_tag and request.maintenance_tag == 'fuel_planning' and request.equipment_id and request.starting_time and request.stage_id.id == repaired_stage.id:
                 before_maintenance_req_in_site = self.sudo().search(
                     [('maintenance_type', '=', 'preventive'), ('maintenance_tag', '=', 'fuel_planning'),
-                     ('stage_id','=',repaired_stage.id),
-                     ('equipment_id','=',request.equipment_id.id),
+                     ('stage_id', '=', repaired_stage.id),
+                     ('equipment_id', '=', request.equipment_id.id),
                      ('starting_time', '<', request.starting_time)],
                     order="starting_time desc", limit=1)
                 request.g1rh_analysis = request.g1rh - before_maintenance_req_in_site.g1rh
@@ -139,21 +140,23 @@ class MaintenanceRequest(models.Model):
     def calc_g2_rh(self):
         for request in self:
             request.g2rh_analysis = 0
-            repaired_stage = self.env['maintenance.stage'].sudo().search([('done', '=', True)],limit=1)
+            repaired_stage = self.env['maintenance.stage'].sudo().search([('done', '=', True)], limit=1)
             if request.g2rh and request.maintenance_type and request.maintenance_type == 'preventive' and request.maintenance_tag and request.maintenance_tag == 'fuel_planning' and request.equipment_id and request.starting_time and request.stage_id.id == repaired_stage.id:
                 before_maintenance_req_in_site = self.sudo().search(
-                    [('maintenance_type', '=', 'preventive'), ('equipment_id','=',request.equipment_id.id),('maintenance_tag', '=', 'fuel_planning'),
+                    [('maintenance_type', '=', 'preventive'), ('equipment_id', '=', request.equipment_id.id),
+                     ('maintenance_tag', '=', 'fuel_planning'),
                      ('starting_time', '<', request.starting_time), ('stage_id', '=', repaired_stage.id)],
                     order="starting_time desc", limit=1)
                 request.g2rh_analysis = request.g2rh - before_maintenance_req_in_site.g2rh
 
+    
     @api.depends('end_time', 'remaining_days_before_next_visit')
     def calc_next_visit_plan(self):
         for request in self:
             if request.next_visit_plan_temp:
                 request.next_visit_plan = request.next_visit_plan_temp
             else:
-                repaired_stage = self.env['maintenance.stage'].sudo().search([('done', '=', True)],limit=1)
+                repaired_stage = self.env['maintenance.stage'].sudo().search([('done', '=', True)], limit=1)
                 request.next_visit_plan = (request.end_time + timedelta(
                     days=int(
                         request.remaining_days_before_next_visit))) if request.end_time and request.stage_id.id == repaired_stage.id else False
@@ -165,7 +168,7 @@ class MaintenanceRequest(models.Model):
     @api.depends('tank_size', 'remain_letters', 'liters_per_hour', 'rh_per_day')
     def calc_remaining_days_before_next_visit(self):
         for req in self:
-            repaired_stage = self.env['maintenance.stage'].sudo().search([('done', '=', True)],limit=1)
+            repaired_stage = self.env['maintenance.stage'].sudo().search([('done', '=', True)], limit=1)
             first_part = (
                     req.tank_size / req.remain_letters) if req.remain_letters and req.stage_id.id == repaired_stage.id else 0
             req.remaining_days_before_next_visit = (first_part / (req.liters_per_hour * req.rh_per_day)) if (
@@ -174,44 +177,45 @@ class MaintenanceRequest(models.Model):
     @api.depends('tank_size', 'reservation_liters')
     def calc_available_for_use(self):
         for record in self:
-            repaired_stage = self.env['maintenance.stage'].sudo().search([('done', '=', True)],limit=1)
+            repaired_stage = self.env['maintenance.stage'].sudo().search([('done', '=', True)], limit=1)
             record.available_for_use = (
                     record.tank_size - record.reservation_liters) if record.stage_id.id == repaired_stage.id else 0
 
     @api.depends('total_rhs', 'days')
     def calc_rh_per_day(self):
         for record in self:
-            repaired_stage = self.env['maintenance.stage'].sudo().search([('done', '=', True)],limit=1)
+            repaired_stage = self.env['maintenance.stage'].sudo().search([('done', '=', True)], limit=1)
             record.rh_per_day = (
                     record.total_rhs / record.days) if record.days and record.stage_id.id == repaired_stage.id else 0
 
     @api.depends('filling_liters', 'total_rhs')
     def calc_liters_per_hour(self):
         for maintenance in self:
-            repaired_stage = self.env['maintenance.stage'].sudo().search([('done', '=', True)],limit=1)
+            repaired_stage = self.env['maintenance.stage'].sudo().search([('done', '=', True)], limit=1)
             maintenance.liters_per_hour = (
                     maintenance.filling_liters / maintenance.total_rhs) if maintenance.total_rhs and maintenance.stage_id.id == repaired_stage.id else 0
 
     @api.depends('g1rh_analysis', 'g2rh_analysis')
     def calc_total_rhs(self):
         for request in self:
-            repaired_stage = self.env['maintenance.stage'].sudo().search([('done', '=', True)],limit=1)
+            repaired_stage = self.env['maintenance.stage'].sudo().search([('done', '=', True)], limit=1)
             request.total_rhs = (
                     request.g1rh_analysis + request.g2rh_analysis) if request.stage_id.id == repaired_stage.id else 0
 
     @api.depends('liters_in_the_tank', 'filling_liters')
     def get_total(self):
         for maintenance in self:
-            repaired_stage = self.env['maintenance.stage'].sudo().search([('done', '=', True)],limit=1)
+            repaired_stage = self.env['maintenance.stage'].sudo().search([('done', '=', True)], limit=1)
             maintenance.total_liters = (
                     maintenance.liters_in_the_tank + maintenance.filling_liters) if maintenance.stage_id.id == repaired_stage.id else 0
 
     @api.depends('equipment_id', 'starting_time')
     def get_days(self):
         for request in self:
-            repaired_stage = self.env['maintenance.stage'].sudo().search([('done', '=', True)],limit=1)
+            repaired_stage = self.env['maintenance.stage'].sudo().search([('done', '=', True)], limit=1)
             before_maintenance_req_in_site = self.env['maintenance.request'].sudo().search(
-                [('maintenance_type', '=', 'preventive'), ('equipment_id','=',request.equipment_id.id),('maintenance_tag', '=', 'fuel_planning'),
+                [('maintenance_type', '=', 'preventive'), ('equipment_id', '=', request.equipment_id.id),
+                 ('maintenance_tag', '=', 'fuel_planning'),
                  ('starting_time', '<', request.starting_time), ('stage_id', '=', repaired_stage.id)],
                 order="starting_time desc", limit=1)
             diff_days = (

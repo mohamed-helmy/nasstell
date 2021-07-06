@@ -66,7 +66,7 @@ class FuelPlanning(models.Model):
                         'date_edit_mode': True
                     })
 
-    @api.onchange('date_start','site_id')
+    @api.onchange('date_start', 'site_id')
     def _fill_lines(self):
         for record in self:
             val = {}
@@ -116,17 +116,24 @@ class FuelPlanningLine(models.Model):
     _description = 'Fuel Planning Line'
     _rec_name = 'plan_id'
 
-    site_id = fields.Many2one(comodel_name="maintenance.equipment",related='plan_id.site_id', ondelete="cascade")
+    site_id = fields.Many2one(comodel_name="maintenance.equipment", related='plan_id.site_id', ondelete="cascade")
     site_name = fields.Char(string='Site Name', related='site_id.name')
     plan_id = fields.Many2one(comodel_name="fuel.planning", required=True, ondelete="cascade")
     maintenance_request_id = fields.Many2one(comodel_name="maintenance.request")
     maintenance_team_id = fields.Many2one(comodel_name="maintenance.team", related='plan_id.maintenance_team_id',
                                           store=1)
     date = fields.Date(string='Plan For next Visit')
+    next_visit_plan = fields.Date(related='maintenance_request_id.next_visit_plan')
     actual_date = fields.Date(string='Actual Date', related='maintenance_request_id.starting_time_date')
-    remain_letters_in_the_tank = fields.Float(string='Remain Letters In The Tank', related='maintenance_request_id.remain_letters')
+    remain_letters_in_the_tank = fields.Float(string='Remain Letters In The Tank',
+                                              related='maintenance_request_id.remain_letters')
     date_edit_mode = fields.Boolean()
 
+    @api.onchange('next_visit_plan')
+    def set_plan_date(self):
+        for line in self:
+            if line.next_visit_plan:
+                line.date = line.next_visit_plan
 
     @api.onchange('date')
     def onchange_date(self):

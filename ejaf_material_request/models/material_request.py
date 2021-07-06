@@ -10,12 +10,10 @@ class MaterialRequest(models.Model):
     _inherit = ['mail.thread']
 
     def _get_picking_type(self):
-        picking_type = int(self.env['ir.config_parameter'].sudo().get_param('picking_type_id'))
-        return picking_type if picking_type else False
+        return self.env.company.picking_type_id if self.env.company.picking_type_id else False
 
     def _get_return_picking_type(self):
-        picking_type = int(self.env['ir.config_parameter'].sudo().get_param('return_picking_type_id'))
-        return picking_type if picking_type else False
+        return self.env.company.return_picking_type_id if self.env.company.return_picking_type_id else False
 
     name = fields.Char(string='Name')
     description = fields.Char(string='Description')

@@ -13,14 +13,14 @@ class TechnicalInspection(models.Model):
                        copy=False, index=True)
     state = fields.Selection(string="State", selection=[('draft', 'In Progress'),
                                                         ('submitted', 'Submitted'),
-                                                        ], default='draft', track_visibility='always')
+                                                        ], default='draft', tracking=True)
 
     maintenance_id = fields.Many2one('maintenance.request', string='Maintenance', required=False)
     maintenance_tag = fields.Selection(
         [('fuel_planning', 'Fuel Planning'), ('generators', 'Generators'), ('full_site', 'Full Site')], string='Tag',
         related='maintenance_id.maintenance_tag')
     job_order_id = fields.Many2one(comodel_name="maintenance.job.order", string="Job Order",
-                                   track_visibility='always', required=False, ondelete="cascade")
+                                   tracking=True, required=False, ondelete="cascade")
     question_line_ids = fields.One2many(comodel_name="check.list.question.line",
                                         inverse_name="technical_inspection_id", readonly=False)
     check_list_id = fields.Many2one(comodel_name="check.list", string="CheckList")
