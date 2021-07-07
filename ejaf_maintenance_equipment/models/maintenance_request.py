@@ -149,7 +149,6 @@ class MaintenanceRequest(models.Model):
                     order="starting_time desc", limit=1)
                 request.g2rh_analysis = request.g2rh - before_maintenance_req_in_site.g2rh
 
-    
     @api.depends('end_time', 'remaining_days_before_next_visit')
     def calc_next_visit_plan(self):
         for request in self:
@@ -160,6 +159,14 @@ class MaintenanceRequest(models.Model):
                 request.next_visit_plan = (request.end_time + timedelta(
                     days=int(
                         request.remaining_days_before_next_visit))) if request.end_time and request.stage_id.id == repaired_stage.id else False
+
+    @api.onchange('next_visit_plan')
+    def _set_fuel_date(self):
+        for request in self:
+            fuel_lines = self.env['fuel.planning.line'].sudo().search(
+                [('site_id', '=', request.equipment_id.id), ('maintenance_request_id', '=', self._origin.id)])
+            for line in fuel_lines:
+                line.date = request.next_visit_plan
 
     def _set_next_visit_plan(self):
         for request in self:
