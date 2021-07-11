@@ -1,9 +1,6 @@
 # -*- coding: utf-8 -*-
-from odoo.exceptions import ValidationError
 from odoo import api, fields, models, _
 from odoo import http, modules, SUPERUSER_ID, tools, _
-
-
 
 
 class MaintenanceEquipment(models.Model):
@@ -14,7 +11,8 @@ class MaintenanceEquipment(models.Model):
 
     def calc_material_requests(self):
         for rec in self:
-            rec.material_request_count = self.env['material.request'].search_count([('site_id', '=', rec.id), ('returned', '=', False)])
+            rec.material_request_count = self.env['material.request'].search_count(
+                [('site_id', '=', rec.id), ('returned', '=', False)])
 
     def action_view_material_requests(self):
         return {
@@ -27,12 +25,14 @@ class MaintenanceEquipment(models.Model):
             ],
             'type': 'ir.actions.act_window',
             'domain': [('site_id', '=', self.id), ('returned', '=', False)],
-            'context': {'default_returned': False}
+            'context': {'default_returned': False,
+                        'default_site_id': self.id}
         }
 
     def calc_returned_material_requests(self):
         for rec in self:
-            rec.returned_material_request_count = self.env['material.request'].search_count([('site_id', '=', rec.id), ('returned', '=', True)])
+            rec.returned_material_request_count = self.env['material.request'].search_count(
+                [('site_id', '=', rec.id), ('returned', '=', True)])
 
     def action_view_returned_material_requests(self):
         return {
@@ -45,5 +45,5 @@ class MaintenanceEquipment(models.Model):
             ],
             'type': 'ir.actions.act_window',
             'domain': [('site_id', '=', self.id), ('returned', '=', True)],
-            'context': {'default_returned': True}
+            'context': {'default_returned': True,'default_site_id': self.id}
         }

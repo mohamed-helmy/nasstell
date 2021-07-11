@@ -55,35 +55,34 @@ class MaintenanceRequest(models.Model):
                         actual_lines.append(created_obj.id)
             req.actual_material_used_ids = actual_lines
 
-
-# @api.depends('material_request_ids')
-# def get_actual_material_used(self):
-#     for req in self:
-#         actual_lines = []
-#         returned_serials = []
-#         if req.material_request_ids:
-#             for material in req.material_request_ids.filtered(lambda mm: mm.state == 'transferred' and mm.line_ids):
-#                 for line in material.line_ids.filtered(
-#                         lambda ll: ll.returned and ll.lot_id.id not in returned_serials):
-#                     returned_serials.append(line.lot_id.id)
-#
-#         if req.material_request_ids:
-#             for material in req.material_request_ids.filtered(lambda mm: mm.state == 'transferred' and mm.line_ids):
-#                 for line in material.line_ids.filtered(lambda ll: not ll.returned):
-#                     move_line = material.picking_id.move_line_ids_without_package.filtered(lambda
-#                                                                                                ll: ll.product_id.id == line.product_id.id and ll.picking_id.id == material.picking_id.id)
-#                     if move_line and move_line[0].lot_id and move_line[0].lot_id.id not in returned_serials:
-#                         created_obj = self.env['actual.material.used'].sudo().create({
-#                             'product_id': line.product_id.id,
-#                             'actual_qty': line.qty,
-#                             'actual_serials': move_line[0].lot_id.name if move_line and move_line[0].lot_id else '',
-#                             'actual_product_status': move_line[0].product_status if move_line and move_line[
-#                                 0].product_status else '',
-#                             'actual_uom': move_line[0].product_uom_id.name if move_line and move_line[
-#                                 0].product_uom_id else '',
-#                         })
-#                         actual_lines.append(created_obj.id)
-#         req.actual_material_used_ids = actual_lines
+    # @api.depends('material_request_ids')
+    # def get_actual_material_used(self):
+    #     for req in self:
+    #         actual_lines = []
+    #         returned_serials = []
+    #         if req.material_request_ids:
+    #             for material in req.material_request_ids.filtered(lambda mm: mm.state == 'transferred' and mm.line_ids):
+    #                 for line in material.line_ids.filtered(
+    #                         lambda ll: ll.returned and ll.lot_id.id not in returned_serials):
+    #                     returned_serials.append(line.lot_id.id)
+    #
+    #         if req.material_request_ids:
+    #             for material in req.material_request_ids.filtered(lambda mm: mm.state == 'transferred' and mm.line_ids):
+    #                 for line in material.line_ids.filtered(lambda ll: not ll.returned):
+    #                     move_line = material.picking_id.move_line_ids_without_package.filtered(lambda
+    #                                                                                                ll: ll.product_id.id == line.product_id.id and ll.picking_id.id == material.picking_id.id)
+    #                     if move_line and move_line[0].lot_id and move_line[0].lot_id.id not in returned_serials:
+    #                         created_obj = self.env['actual.material.used'].sudo().create({
+    #                             'product_id': line.product_id.id,
+    #                             'actual_qty': line.qty,
+    #                             'actual_serials': move_line[0].lot_id.name if move_line and move_line[0].lot_id else '',
+    #                             'actual_product_status': move_line[0].product_status if move_line and move_line[
+    #                                 0].product_status else '',
+    #                             'actual_uom': move_line[0].product_uom_id.name if move_line and move_line[
+    #                                 0].product_uom_id else '',
+    #                         })
+    #                         actual_lines.append(created_obj.id)
+    #         req.actual_material_used_ids = actual_lines
 
     @api.depends('material_request_ids')
     def get_material_lines(self):
@@ -178,12 +177,10 @@ class MaintenanceRequest(models.Model):
                     material_lines.append(created_obj.id)
             req.material_request_line_ids = material_lines
 
-
     def calc_material_requests(self):
         for maintenance in self:
             maintenance.material_request_count = len(
                 maintenance.material_request_ids.filtered(lambda m: not m.returned))
-
 
     def action_view_material_requests(self):
         return {
@@ -196,13 +193,12 @@ class MaintenanceRequest(models.Model):
             ],
             'type': 'ir.actions.act_window',
             'domain': [('maintenance_request_id', '=', self.id), ('returned', '=', False)],
-            'context': {'default_maintenance_request_id': self.id, 'default_returned': False}
+            'context': {'default_maintenance_request_id': self.id, 'default_returned': False,
+                        'default_site_id': self.equipment_id.id}
         }
-
 
     def calc_returned_material_requests(self):
         self.returned_material_request_count = len(self.material_request_ids.filtered(lambda m: m.returned))
-
 
     def action_view_returned_material_requests(self):
         return {
@@ -215,9 +211,9 @@ class MaintenanceRequest(models.Model):
             ],
             'type': 'ir.actions.act_window',
             'domain': [('maintenance_request_id', '=', self.id), ('returned', '=', True)],
-            'context': {'default_maintenance_request_id': self.id, 'default_returned': True}
+            'context': {'default_maintenance_request_id': self.id, 'default_returned': True,
+                        'default_site_id': self.equipment_id.id}
         }
-
 
     def action_timer_stop(self):
         self.ensure_one()

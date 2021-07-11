@@ -8,6 +8,7 @@
             <field name="arch" type="xml">
                 <field name="origin" position="after">
                     <field name="material_request_id" readonly="1" force_save="1"/>
+                    <field name="site_id" readonly="1" force_save="1"/>
                 </field>
             </field>
         </record>

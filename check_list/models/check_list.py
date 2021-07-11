@@ -14,3 +14,4 @@ class CheckList(models.Model):
         [('fuel_planning', 'Fuel Planning'), ('generators', 'Generators'), ('full_site', 'Full Site')], string='Type')
     is_default = fields.Boolean(string='Default?')
     is_mandatory = fields.Boolean(string='Mandatory?')
+    company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company)

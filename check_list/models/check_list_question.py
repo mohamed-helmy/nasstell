@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-from odoo import models, fields
+from odoo import models, fields, api
+from odoo.exceptions import ValidationError
 
 
 class CheckListQuestion(models.Model):
@@ -24,7 +25,6 @@ class CheckListQuestion(models.Model):
 class CheckListQuestionLine(models.Model):
     _name = 'check.list.question.line'
     _description = "Check List Question Line"
-    _order = "sequence"
 
     checklist_question_id = fields.Many2one(comodel_name="check.list.question", required=True,
                                             string="CheckList Question", ondelete='cascade')
@@ -36,3 +36,15 @@ class CheckListQuestionLine(models.Model):
     no_ok_answer = fields.Boolean(string='NoT OK', default=False)
     na_answer = fields.Boolean(string='NA', default=False)
     comment = fields.Char(string="Comment")
+
+    @api.onchange('yes_answer', 'no_answer', 'no_ok_answer', 'na_answer')
+    def _check_one_answer(self):
+        for line in self:
+            if line.yes_answer and (line.no_answer or line.no_ok_answer or line.na_answer):
+                raise ValidationError('You should select at least one answer')
+            elif line.no_answer and (line.yes_answer or line.no_ok_answer or line.na_answer):
+                raise ValidationError('You should select at least one answer')
+            elif line.no_ok_answer and (line.yes_answer or line.no_answer or line.na_answer):
+                raise ValidationError('You should select at least one answer')
+            elif line.na_answer and (line.yes_answer or line.no_answer or line.no_ok_answer):
+                raise ValidationError('You should select at least one answer')

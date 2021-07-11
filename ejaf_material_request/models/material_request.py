@@ -18,7 +18,7 @@ class MaterialRequest(models.Model):
     name = fields.Char(string='Name')
     description = fields.Char(string='Description')
     maintenance_request_id = fields.Many2one('maintenance.request', string='Maintenance Request')
-    site_id = fields.Many2one('maintenance.equipment', string='Site', related='maintenance_request_id.equipment_id', store=1)
+    site_id = fields.Many2one('maintenance.equipment', string='Site')
     line_ids = fields.One2many('material.request.line', 'material_request_id', string='Lines')
     picking_id = fields.Many2one('stock.picking', string='Picking')
     state = fields.Selection(
@@ -28,6 +28,8 @@ class MaterialRequest(models.Model):
     return_picking_type_id = fields.Many2one('stock.picking.type', string='Transfer Operation',
                                              default=_get_return_picking_type)
     returned = fields.Boolean(string='Returned')
+    location_id = fields.Many2one('stock.location', string='Source Location')
+    location_dest_id = fields.Many2one('stock.location', string='Destination Location')
 
     @api.model
     def create(self, values):
@@ -61,9 +63,12 @@ class MaterialRequest(models.Model):
                 picking_type = material.picking_type_id
             else:
                 picking_type = material.return_picking_type_id
+            if not material.site_id or not material.site_id.site_location_id:
+                raise ValidationError('Site have no location!!!')
             picking = self.env['stock.picking'].create({'picking_type_id': picking_type.id,
+                                                        'site_id': material.site_id.id,
                                                         'location_id': picking_type.default_location_src_id.id,
-                                                        'location_dest_id': picking_type.default_location_dest_id.id})
+                                                        'location_dest_id': material.site_id.site_location_id.id})
             if material.returned:
                 picking.name = 'Returned Of' + str(material.name)
             for line in material.line_ids:
@@ -76,11 +81,13 @@ class MaterialRequest(models.Model):
                     'product_uom': line.uom_id.id,
                     'date': fields.Datetime.now(),
                     'location_id': picking_type.default_location_src_id.id,
-                    'location_dest_id': picking_type.default_location_dest_id.id
+                    'location_dest_id': material.site_id.site_location_id.id
                 })
             picking.material_request_id = material.id
             picking.action_confirm()
             material.picking_id = picking.id
+            material.location_id = picking.location_id.id
+            material.location_dest_id = picking.location_dest_id.id
 
 
 class MaterialRequestLine(models.Model):

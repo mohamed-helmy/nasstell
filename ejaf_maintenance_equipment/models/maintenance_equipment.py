@@ -294,6 +294,15 @@ class MaintenanceEquipment(models.Model):
                                         string="Tower Topology (RT/GF)", required=False, )
     clu_status_id = fields.Many2one(comodel_name="clu.status",
                                     string="CLU Status", required=False, )
+    site_location_id = fields.Many2one('stock.location', string='Site Location')
+
+    @api.model
+    def create(self, vals):
+        stock_location = self.env['stock.location'].sudo().create({'name': vals['name'],
+                                                                   'usage': 'internal',
+                                                                   'company_id': self.env.company.id})
+        vals['site_location_id'] = stock_location.id
+        return super(MaintenanceEquipment, self).create(vals)
 
     @api.constrains('fuel_ids')
     def set_next_visit(self):

@@ -121,6 +121,7 @@ class MaintenanceRequest(models.Model):
     next_visit_plan_temp = fields.Date(string='Next Visit Plan')
     timer_started = fields.Boolean()
     timer_stopped = fields.Boolean()
+    member_ids = fields.Many2many('res.users', string='Team Members')
 
     @api.depends('g1rh', 'maintenance_type', 'equipment_id', 'maintenance_tag', 'starting_time')
     def calc_g1_rh(self):
@@ -165,8 +166,16 @@ class MaintenanceRequest(models.Model):
         for request in self:
             fuel_lines = self.env['fuel.planning.line'].sudo().search(
                 [('site_id', '=', request.equipment_id.id), ('maintenance_request_id', '=', self._origin.id)])
+            planning_ids = []
             for line in fuel_lines:
-                line.date = request.next_visit_plan
+                if line.plan_id.id not in planning_ids:
+                    planning_ids.append(line.plan_id.id)
+            for plan in planning_ids:
+                self.env['fuel.planning.line'].sudo().create({'plan_id': plan,
+                                                              'site_id': request.equipment_id.id,
+                                                              'date': request.next_visit_plan,
+                                                              'maintenance_request_id': self._origin.id,
+                                                              'maintenance_team_id': request.maintenance_team_id.id})
 
     def _set_next_visit_plan(self):
         for request in self:
@@ -236,6 +245,16 @@ class MaintenanceRequest(models.Model):
                 site_generators = self.env['site.generator'].sudo().search([('site_id', '=', request.equipment_id.id)])
                 request.planned_generator_ids = site_generators.ids
 
+    @api.onchange('equipment_id')
+    def onchange_equipment_id(self):
+        super(MaintenanceRequest, self).onchange_equipment_id()
+        self.user_id = False
+
+    @api.onchange('category_id')
+    def onchange_category_id(self):
+        super(MaintenanceRequest, self).onchange_category_id()
+        self.user_id = False
+
     @api.onchange('maintenance_type', 'maintenance_tag')
     @api.depends('maintenance_type', 'maintenance_tag')
     def set_maintenance_team_domain(self):
@@ -258,6 +277,20 @@ class MaintenanceRequest(models.Model):
             request.maintenance_team_id = teams[0].id if teams else False
             return {'domain': {
                 'maintenance_team_id': [('id', 'in', teams_arr), ('company_id', '=', self.company_id.id)]
+            }}
+
+    @api.onchange('maintenance_team_id')
+    def set_maintenance_members_domain(self):
+        for request in self:
+            member_arr = []
+            if request.maintenance_team_id:
+                request.member_ids = False
+                member_arr = request.maintenance_team_id.member_ids.ids
+                if request.maintenance_team_id.team_leader_id:
+                    member_arr.append(request.maintenance_team_id.team_leader_id.id)
+            return {'domain': {
+                'member_ids': [('id', 'in', member_arr), ('company_id', '=', self.company_id.id)],
+                'user_id': [('id', 'in', member_arr), ('company_id', '=', self.company_id.id)]
             }}
 
     @api.constrains('checklist_ids')
@@ -301,23 +334,9 @@ class MaintenanceRequest(models.Model):
         for record in self:
             if record.maintenance_tag:
                 checklists = self.env['check.list'].sudo().search(
-                    [('type', '=', record.maintenance_tag), ('is_default', '=', True)])
+                    [('type', '=', record.maintenance_tag), ('is_default', '=', True),
+                     ('company_id', '=', self.env.company.id)])
                 record.checklist_ids = [(6, 0, checklists.ids)]
-
-    # @api.onchange('maintenance_team_id')
-    # def set_responsible(self):
-    #     for request in self:
-    #         if request.maintenance_team_id and request.maintenance_team_id.team_leader_id:
-    #             request.user_id = request.maintenance_team_id.team_leader_id.id
-    #             user = request.maintenance_team_id.team_leader_id
-    #             partner_ids = [user.partner_id.id]
-    #             request.message_notify(
-    #                 partner_ids=partner_ids,
-    #                 subject=_('Check the maintenance request [%s] for the planning date %s') % (
-    #                     request.name, request.request_date),
-    #                 message_type='email',
-    #                 subtype='mt_comment',
-    #             )
 
     @api.depends('timer_first_start', 'starting_time')
     def _calc_dates(self):
@@ -332,7 +351,7 @@ class MaintenanceRequest(models.Model):
         if not self.timer_first_start:
             self.write({'timer_first_start': fields.Datetime.now()})
         stage = self.env['maintenance.stage'].sudo().search([('name', '=', 'In Progress')])
-        self.write({'timer_start': fields.Datetime.now(), 'stage_id': stage.id})
+        self.write({'timer_start': fields.Datetime.now(), 'stage_id': stage.id, 'user_id': self.env.user.id})
 
     def action_timer_stop(self):
         self.ensure_one()
@@ -361,6 +380,10 @@ class MaintenanceRequest(models.Model):
                     request.user_id = request.maintenance_team_id.team_leader_id.id
                     user = request.maintenance_team_id.team_leader_id
                     partner_ids = [user.partner_id.id]
+                    if request.member_ids:
+                        for member in request.member_ids:
+                            if member.partner_id.id not in partner_ids:
+                                partner_ids.append(member.partner_id.id)
                     request.message_notify(
                         partner_ids=partner_ids,
                         subject=_('Check the maintenance request [%s] for the planning date %s') % (

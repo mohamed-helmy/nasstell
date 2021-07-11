@@ -7,6 +7,7 @@ class StockPicking(models.Model):
     _inherit = 'stock.picking'
 
     material_request_id = fields.Many2one('material.request', string='Material Request')
+    site_id = fields.Many2one('maintenance.equipment', string='Site')
 
     def action_assign(self):
         for picking in self:
@@ -27,7 +28,7 @@ class StockPicking(models.Model):
                             'product_uom_id': line.uom_id.id,
                             'date': fields.Datetime.now(),
                             'location_id': picking.picking_type_id.default_location_src_id.id,
-                            'location_dest_id': picking.picking_type_id.default_location_dest_id.id
+                            'location_dest_id': picking.site_id.site_location_id.id
                         })
 
             return res

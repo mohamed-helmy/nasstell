@@ -6,6 +6,12 @@
             <field name="model">maintenance.request</field>
             <field name="inherit_id" ref="maintenance.hr_equipment_request_view_form"/>
             <field name="arch" type="xml">
+                <field name="user_id" position="before">
+                    <field name="member_ids"
+                           options="{'no_create': True}"
+                           widget="many2many_tags"
+                           attrs="{'invisible':[('maintenance_type','=','preventive')]}"/>
+                </field>
                 <field name="maintenance_type" position="after">
                     <field name="maintenance_tag"
                            attrs="{'invisible':[('maintenance_type','!=','preventive')]}"/>
@@ -172,6 +178,7 @@
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='member_ids']" position="before">
                     <field name="team_leader_id"/>
+                    <field name="company_id" invisible="1"/>
                 </xpath>
                 <xpath expr="//field[@name='company_id']" position="after">
                     <field name="show_tags" invisible="1"/>
@@ -283,6 +290,7 @@
                                 <field name="company_id" groups="base.group_multi_company"
                                        options="{'no_create': True}"/>
                                 <field name="equipment_assign_to" widget="radio" invisible="1"/>
+                                <field name="site_location_id" readonly="1" force_save="1"/>
                                 <field name="employee_id" string="Employee" invisible="1"/>
                                 <field name="department_id" string="Department"
                                        attrs="{'invisible': ['|', ('equipment_assign_to', '=', 'employee'), ('equipment_assign_to', '=', False)]}"/>
