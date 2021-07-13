@@ -9,8 +9,7 @@ class TechnicalInspection(models.Model):
     _description = "Technical Inspection"
     _inherit = 'mail.thread'
 
-    name = fields.Char(string="Sequence", required=True, default='/',
-                       copy=False, index=True)
+    name = fields.Char(string="Sequence", required=True, default='/', copy=False, index=True)
     state = fields.Selection(string="State", selection=[('draft', 'In Progress'),
                                                         ('submitted', 'Submitted'),
                                                         ], default='draft', tracking=True)
@@ -24,11 +23,9 @@ class TechnicalInspection(models.Model):
     question_line_ids = fields.One2many(comodel_name="check.list.question.line",
                                         inverse_name="technical_inspection_id", readonly=False)
     check_list_id = fields.Many2one(comodel_name="check.list", string="CheckList")
-
     site_before_attach_ids = fields.Many2many('ir.attachment', 'sit_att_rel', 'ti_id', 'attach_id',
                                               string='Attachments', tracking=True, readonly=True,
                                               states={'draft': [('readonly', False)]})
-
     site_after_attach_ids = fields.Many2many('ir.attachment', 'sit_after_att_rel', 'ti_id', 'attach_id',
                                              string='Attachments', tracking=True, readonly=True,
                                              states={'draft': [('readonly', False)]})

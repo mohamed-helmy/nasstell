@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="site_planning_view_form" model="ir.ui.view">
+            <field name="name">site.planning.form</field>
+            <field name="model">site.planning</field>
+            <field name="arch" type="xml">
+                <form string="Planning">
+                    <sheet>
+                        <group>
+                            <field name="maintenance_team_id" options="{'no_create': True}"/>
+                            <field name="site_id" readonly="1" force_save="1" invisible="1"/>
+                            <field name="site_name"/>
+                        </group>
+                        <group>
+                            <div>
+                                <group>
+                                    <label for="recurring_interval"/>
+                                    <div class="o_row">
+                                        <field name="recurring_interval"/>
+                                        <field name="recurring_rule_type"/>
+                                    </div>
+                                    <label string="Until" for="recurring_rule_boundary"/>
+                                    <div class="o_row">
+                                        <field name="recurring_rule_boundary"/>
+                                        <field name="recurring_rule_count"
+                                               attrs="{'invisible': [('recurring_rule_boundary', '!=', 'limited')], 'required': [('recurring_rule_boundary', '=', 'limited')]}"/>
+                                        <field name="date_end"
+                                               attrs="{'invisible': [('recurring_rule_boundary', '!=', 'end_date')], 'required': [('recurring_rule_boundary', '=', 'end_date')]}"/>
+                                    </div>
+                                </group>
+                                <group>
+                                    <field name="date_start"/>
+                                </group>
+                            </div>
+                        </group>
+                        <notebook>
+                            <page string="Lines" name="lines">
+                                <button name="action_replan_dates"
+                                        string="Replan Dates"
+                                        class="oe_highlight"
+                                        type="object"
+                                        icon="fa-refresh"/>
+                                <field name="planning_lines_ids" context="{'default_site_id':site_id}">
+                                    <tree editable="bottom">
+                                        <field name="site_id" invisible="1"/>
+                                        <field name="site_name"/>
+                                        <field name="date"/>
+                                        <field name="actual_date"/>
+                                        <field name="plan_week" readonly="1" force_save="1"/>
+                                        <field name="maintenance_team_id"/>
+                                        <field name="maintenance_request_id" optional="hide"/>
+                                        <field name="achieved"/>
+                                        <field name="date_edit_mode" invisible="1"/>
+                                        <field name="active" widget="boolean_toggle"/>
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
+
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="site_planning_line_view_form" model="ir.ui.view">
+            <field name="name">site.planning.line.form</field>
+            <field name="model">site.planning.line</field>
+            <field name="arch" type="xml">
+                <form string="Planning Line">
+                    <sheet>
+                        <div class="oe_button_box" name="button_box">
+                            <button name="toggle_active" type="object" class="oe_stat_button" icon="fa-archive"
+                                    attrs="{'invisible': [('active', '=', False)]}">
+                                Archive
+                            </button>
+                            <button name="toggle_active" type="object" class="oe_stat_button" icon="fa-archive"
+                                    attrs="{'invisible': [('active', '=', True)]}">
+                                UnArchive
+                            </button>
+                        </div>
+                        <widget name="web_ribbon" title="Archived" bg_color="bg-danger"
+                                attrs="{'invisible': [('active', '=', True)]}"/>
+                        <group>
+                            <group>
+                                <field name="active" invisible="1"/>
+                                <field name="site_id"/>
+                                <field name="date"/>
+                                <field name="plan_week" readonly="1" force_save="1"/>
+                            </group>
+                            <group>
+                                <field name="maintenance_team_id"/>
+                                <field name="maintenance_request_id" optional="hide"/>
+                                <field name="achieved"/>
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="site_planning_line_view_tree" model="ir.ui.view">
+            <field name="name">site.planning.line.tree</field>
+            <field name="model">site.planning.line</field>
+            <field name="arch" type="xml">
+                <tree string="Planning Lines" create="0" delete="0">
+                    <field name="site_id"/>
+                    <field name="date"/>
+                    <field name="plan_week" readonly="1" force_save="1"/>
+                    <field name="maintenance_team_id"/>
+                    <field name="maintenance_request_id" optional="hide"/>
+                    <field name="achieved"/>
+                    <field name="active" widget="boolean_toggle"/>
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="site_planning_line_pivot">
+            <field name="name">site.planning.line.pivot</field>
+            <field name="model">site.planning.line</field>
+            <field name="arch" type="xml">
+                <pivot string="Statistics">
+                    <field name="site_id" type="row"/>
+                    <field name="date" type="row"/>
+                    <field name="plan_week" type="row"/>
+                </pivot>
+            </field>
+        </record>
+        <record id="site_planning_line_search" model="ir.ui.view">
+            <field name="name">site.planning.line.search</field>
+            <field name="model">site.planning.line</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="site_id"/>
+                    <field name="maintenance_request_id"/>
+                    <field name="maintenance_team_id"/>
+                    <group expand="1" string="Group By">
+                        <filter string="Site"
+                                name="group_site_id"
+                                context="{'group_by':'site_id'}"/>
+                        <filter string="Maintenance Team"
+                                name="group_maintenance_team_id"
+                                context="{'group_by':'maintenance_team_id'}"/>
+                        <filter string="Plan Week"
+                                name="group_plan_week"
+                                context="{'group_by':'plan_week'}"/>
+                        <filter string="Planned Date"
+                                name="group_date"
+                                context="{'group_by':'date'}"/>
+                        <filter string="Achieved"
+                                name="group_achieved"
+                                context="{'group_by':'achieved'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <record id="site_planning_lines_action" model="ir.actions.act_window">
+            <field name="name">Site Planning Lines</field>
+            <field name="res_model">site.planning.line</field>
+            <field name="view_mode">tree,form,pivot</field>
+            <field name="context">
+                {'search_default_group_site_id':1,'search_default_group_achieved':1,'search_default_group_maintenance_team_id':1}
+            </field>
+            <field name="view_id" ref="site_planning_line_view_tree"/>
+        </record>
+    </data>
+</odoo>

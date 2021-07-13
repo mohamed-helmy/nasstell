@@ -30,6 +30,7 @@ class MaterialRequest(models.Model):
     returned = fields.Boolean(string='Returned')
     location_id = fields.Many2one('stock.location', string='Source Location')
     location_dest_id = fields.Many2one('stock.location', string='Destination Location')
+    company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company)
 
     @api.model
     def create(self, values):

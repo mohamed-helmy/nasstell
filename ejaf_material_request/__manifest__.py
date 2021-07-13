@@ -8,6 +8,7 @@
     'website': "http://www.ejaftech.com/",
     'depends': ['ejaf_product_status', 'ejaf_maintenance'],
     'data': [
+        'security/security.xml',
         'security/ir.model.access.csv',
         'data/sequence.xml',
         'views/material_request.xml',

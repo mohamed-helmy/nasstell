@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="maintenance_team_view_form_inherit" model="ir.ui.view">
+            <field name="name">maintenance.team.form</field>
+            <field name="model">maintenance.team</field>
+            <field name="inherit_id" ref="maintenance.maintenance_team_view_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='member_ids']" position="before">
+                    <field name="team_leader_id"/>
+                    <field name="company_id" invisible="1"/>
+                </xpath>
+                <xpath expr="//field[@name='company_id']" position="after">
+                    <field name="show_tags" invisible="1"/>
+                    <field name="maintenance_type_ids"
+                           options="{'no_create': True}"
+                           widget="many2many_tags"/>
+                    <field name="maintenance_tag_ids"
+                           attrs="{'invisible':[('show_tags','=',False)],'required':[('show_tags','=',True)]}"
+                           options="{'no_create': True}"
+                           widget="many2many_tags"/>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="maintenance_team_view_tree_inherit" model="ir.ui.view">
+            <field name="name">maintenance.team.tree</field>
+            <field name="model">maintenance.team</field>
+            <field name="inherit_id" ref="maintenance.maintenance_team_view_tree"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='member_ids']" position="before">
+                    <field name="is_manager" invisible="1"/>
+                    <field name="team_leader_id"
+                           attrs="{'readonly':[('is_manager','=',False)]}"/>
+                </xpath>
+                <xpath expr="//field[@name='name']" position="attributes">
+                    <attribute name="attrs">{'readonly':[('is_manager','=',False)]}</attribute>
+                </xpath>
+                <xpath expr="//field[@name='company_id']" position="attributes">
+                    <attribute name="attrs">{'readonly':[('is_manager','=',False)]}</attribute>
+                </xpath>
+            </field>
+        </record>
+
+    </data>
+</odoo>

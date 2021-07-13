@@ -4,7 +4,7 @@
         <record id="maintenance_request_form_view_inherit_material" model="ir.ui.view">
             <field name="name">maintenance.request.form.view.inherit.material</field>
             <field name="model">maintenance.request</field>
-            <field name="inherit_id" ref="ejaf_maintenance.hr_equipment_request_view_form"/>
+            <field name="inherit_id" ref="ejaf_maintenance.maintenance_request_form_view_inherit"/>
             <field name="arch" type="xml">
                 <xpath expr="//div[@class='oe_button_box']" position="inside">
                     <button name="action_view_material_requests"

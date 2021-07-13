@@ -17,8 +17,7 @@ class MaintenanceTimesheet(models.Model):
     @api.depends('order_check_in', 'order_check_out')
     def _compute_duration(self):
         for record in self:
+            record.duration = False
             if record.order_check_in and record.order_check_out:
                 date_difference = record.order_check_out - record.order_check_in
                 record.duration = str(date_difference.days) + ":" + str(round(date_difference.seconds / 3600))
-            else:
-                record.duration = False

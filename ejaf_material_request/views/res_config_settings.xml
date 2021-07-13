@@ -5,7 +5,7 @@
         <field name="name">res.config.settings.view.form.inherit.maintenance.picking_type</field>
         <field name="model">res.config.settings</field>
         <field name="priority" eval="25"/>
-        <field name="inherit_id" ref="ejaf_maintenance_equipment.res_config_settings_view_form_maintenance"/>
+        <field name="inherit_id" ref="ejaf_maintenance.res_config_settings_view_form_maintenance"/>
         <field name="arch" type="xml">
             <xpath expr="//div[@data-key='maintenance']" position="inside">
                 <h2>Material Request Settings</h2>

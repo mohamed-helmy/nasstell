@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <data>
+        <record id="problem_category_form_view" model="ir.ui.view">
+            <field name="name">problem.category.form.view</field>
+            <field name="model">problem.category</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="name" required="1"/>
+                            </group>
+                            <group>
+                                <field name="parent_category_id"/>
+                            </group>
+                            <group>
+                                <field name="type" required="1"/>
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="problem_category_action" model="ir.actions.act_window">
+            <field name="name">Problem Category</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">problem.category</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+    </data>
+</odoo>

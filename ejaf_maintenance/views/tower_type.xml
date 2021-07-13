@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="tower_type_form_view" model="ir.ui.view">
+            <field name="name">tower.type.form</field>
+            <field name="model">tower.type</field>
+            <field name="arch" type="xml">
+                <form string="Tower type">
+                    <sheet>
+                        <group>
+                            <field name="name"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        <record id="tower_type_tree_view" model="ir.ui.view">
+            <field name="name">tower.type.tree</field>
+            <field name="model">tower.type</field>
+            <field name="arch" type="xml">
+                <tree string="Tower type">
+
+                    <field name="name"/>
+                </tree>
+            </field>
+        </record>
+        <record id="tower_type_action_view" model="ir.actions.act_window">
+            <field name="name">Tower Type</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">tower.type</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+    </data>
+</odoo>

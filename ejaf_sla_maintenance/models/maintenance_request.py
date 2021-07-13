@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
-import logging
 from odoo import api, fields, models, _
 from datetime import timedelta
-_logger = logging.getLogger(__name__)
 from odoo.exceptions import ValidationError
 
 
@@ -34,6 +32,9 @@ class MaintenanceRequest(models.Model):
     @api.onchange('equipment_id', 'maintenance_type', 'equipment_id.category_type')
     def _set_sla_duration(self):
         for request in self:
+            if request.equipment_id and request.maintenance_type == 'emergency':
+                sla_policies = self.env['sla.policy'].sudo().search([])
+                request.sla_policy_id = sla_policies[0].id if sla_policies else False
             if request.equipment_id and request.equipment_id.category_type and request.maintenance_type == 'emergency':
                 sla_lines = self.env['sla.policy.line'].sudo().search([]).filtered(
                     lambda l: l.site_category == request.equipment_id.category_type)
@@ -78,9 +79,6 @@ class MaintenanceRequest(models.Model):
                 outage_duration_seconds = outage_duration_s + outage_duration_m * 60 + outage_duration_h * 60 * 60
                 if maintenance_duration_seconds > outage_duration_seconds:
                     user = request.maintenance_team_id.team_leader_id
-                    _logger.info('----------------------------')
-                    _logger.info(user.partner_id.id)
-                    _logger.info('----------------------------')
                     if user.partner_id.id == False:
                         raise ValidationError('There is No Team Leader in Your Team')
 

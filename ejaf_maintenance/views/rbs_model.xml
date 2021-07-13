@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="rbs_model_form_view" model="ir.ui.view">
+            <field name="name">rbs.model.form</field>
+            <field name="model">rbs.model</field>
+            <field name="arch" type="xml">
+                <form string="RBS Model">
+                    <sheet>
+                        <group>
+                            <field name="name"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        <record id="rbs_model_tree_view" model="ir.ui.view">
+            <field name="name">rbs.model.tree</field>
+            <field name="model">rbs.model</field>
+            <field name="arch" type="xml">
+                <tree string="RBS Model">
+
+                    <field name="name"/>
+                </tree>
+            </field>
+        </record>
+        <record id="rbs_model_action_view" model="ir.actions.act_window">
+            <field name="name">RBS Model</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">rbs.model</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+    </data>
+</odoo>

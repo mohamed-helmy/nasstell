@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="battery_manufacturer_form_view" model="ir.ui.view">
+            <field name="name">battery.manufacturer.form</field>
+            <field name="model">battery.manufacturer</field>
+            <field name="arch" type="xml">
+                <form string="Battery Manufacturer">
+                    <sheet>
+                        <group>
+                            <field name="name"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        <record id="battery_manufacturer_tree_view" model="ir.ui.view">
+            <field name="name">battery.manufacturer.tree</field>
+            <field name="model">battery.manufacturer</field>
+            <field name="arch" type="xml">
+                <tree string="Battery Manufacturer">
+
+                    <field name="name"/>
+                </tree>
+            </field>
+        </record>
+        <record id="battery_manufacturer_action_view" model="ir.actions.act_window">
+            <field name="name">Battery Manufacturer</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">battery.manufacturer</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+    </data>
+</odoo>

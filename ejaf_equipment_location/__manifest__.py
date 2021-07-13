@@ -3,7 +3,7 @@
 {
     'name': 'Ejaf Equipment Location',
     'depends': [
-        'ejaf_maintenance_equipment',
+        'ejaf_maintenance',
         'web_google_maps'
 
     ],

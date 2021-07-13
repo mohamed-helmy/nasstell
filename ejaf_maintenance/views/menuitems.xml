@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <data>
+        <menuitem id="alternator_manufacturer_action_menu"
+                  name="Alternator Manufacturer"
+                  parent="maintenance.menu_maintenance_configuration"
+                  action="alternator_manufacturer_action_view"
+                  sequence="18"/>
+
+        <menuitem id="alternator_model_action_menu"
+                  name="Alternator Model"
+                  parent="maintenance.menu_maintenance_configuration"
+                  action="alternator_model_action_view"
+                  sequence="8"/>
+
+        <menuitem id="amm_type_action_menu"
+                  name="AMM Type"
+                  parent="maintenance.menu_maintenance_configuration"
+                  action="amm_type_action_view"
+                  sequence="16"/>
+
+        <menuitem id="antenna_type_action_menu"
+                  name="Antenna Type"
+                  parent="maintenance.menu_maintenance_configuration"
+                  action="antenna_type_action_view"
+                  sequence="16"/>
+
+        <menuitem id="ats_model_action_menu"
+                  name="ATS Model"
+                  parent="maintenance.menu_maintenance_configuration"
+                  action="ats_model_action_view"
+                  sequence="11"/>
+
+        <menuitem id="battery_manufacturer_action_menu"
+                  name="Battery Manufacturer"
+                  parent="maintenance.menu_maintenance_configuration"
+                  action="battery_manufacturer_action_view"
+                  sequence="12"/>
+
+        <menuitem id="battery_model_action_menu"
+                  name="Battery Model"
+                  parent="maintenance.menu_maintenance_configuration"
+                  action="battery_model_action_view"
+                  sequence="13"/>
+
+        <menuitem id="clu_status_action_menu"
+                  name="CLU Status"
+                  parent="maintenance.menu_maintenance_configuration"
+                  action="clu_status_action_view"
+                  sequence="19"/>
+
+        <menuitem id="dvr_type_action_menu"
+                  name="DVR Type"
+                  parent="maintenance.menu_maintenance_configuration"
+                  action="dvr_type_action_view"
+                  sequence="17"/>
+
+        <menuitem id="engine_manufacturer_action_menu"
+                  name="Engine Manufacturer"
+                  parent="maintenance.menu_maintenance_configuration"
+                  action="engine_manufacturer_action_view"
+                  sequence="9"/>
+
+        <menuitem id="engine_model_action_menu"
+                  name="Engine Model"
+                  parent="maintenance.menu_maintenance_configuration"
+                  action="engine_model_action_view"
+                  sequence="10"/>
+
+        <menuitem id="fiber_connection_action_menu"
+                  name="Fiber Connection"
+                  parent="maintenance.menu_maintenance_configuration"
+                  action="fiber_connection_action_view"
+                  sequence="14"/>
+        <menuitem id="fuel_tank_type_action_menu"
+                  name="Fuel Tank Type"
+                  parent="maintenance.menu_maintenance_configuration"
+                  action="fuel_tank_type_action_view" sequence="8"/>
+
+        <menuitem id="gen_set_manufacturer_action_menu"
+                  name="Gen Set Manufacturer"
+                  parent="maintenance.menu_maintenance_configuration"
+                  action="gen_set_manufacturer_action_view"
+                  sequence="17"/>
+
+        <menuitem id="ti_menu_action"
+                  name="Technical Inspection"
+                  parent="maintenance.menu_m_request"
+                  action="ti_view_action"/>
+
+        <menuitem id="maintenance_job_order_menu"
+                  parent="maintenance.menu_m_request"
+                  action="maintenance_job_order_action"
+                  sequence="100"/>
+
+        <menuitem id="problem_category_menu"
+                  name="Problem Category"
+                  parent="maintenance.menu_maintenance_configuration"
+                  action="problem_category_action"/>
+
+        <menuitem id="generator_planning_lines_menu"
+                  name="Generator Planning Lines"
+                  parent="ejaf_maintenance_menus.generator_reporting_categ"
+                  action="generator_planning_lines_action"
+                  sequence="3"/>
+
+        <menuitem id="generator_menu"
+                  name="Generators"
+                  parent="maintenance.menu_maintenance_configuration"
+                  action="generator_action"/>
+
+        <menuitem id="l_type_action_menu"
+                  name="L-Type"
+                  parent="maintenance.menu_maintenance_configuration"
+                  action="l_type_action_view"
+                  sequence="17"/>
+
+        <menuitem id="mmu_type_action_menu"
+                  name="MMU Type"
+                  parent="maintenance.menu_maintenance_configuration"
+                  action="mmu_type_action_view"
+                  sequence="15"/>
+
+        <menuitem id="ne_impacted_action_menu"
+                  name="Ne Impacted"
+                  parent="maintenance.menu_maintenance_configuration"
+                  action="ne_impacted_action_view"
+                  sequence="5"/>
+
+        <menuitem id="ne_type_action_menu"
+                  name="Ne Type"
+                  parent="maintenance.menu_maintenance_configuration"
+                  action="ne_type_action_view"
+                  sequence="4"/>
+
+        <menuitem id="od_type_action_menu"
+                  name="Id/Od Type"
+                  parent="maintenance.menu_maintenance_configuration"
+                  action="od_type_action_view"
+                  sequence="4"/>
+
+        <menuitem id="rbs_model_action_menu"
+                  name="RBS Model"
+                  parent="maintenance.menu_maintenance_configuration"
+                  action="rbs_model_action_view"
+                  sequence="11"/>
+
+        <menuitem id="region_action_menu"
+                  name="region"
+                  parent="maintenance.menu_maintenance_configuration"
+                  action="region_action_view"
+                  sequence="3"/>
+
+        <menuitem id="rect_brand_action_menu"
+                  name="Rect Brand"
+                  parent="maintenance.menu_maintenance_configuration"
+                  action="rect_brand_action_view"
+                  sequence="13"/>
+
+        <menuitem id="radio_type_action_menu"
+                  name="Radio Type"
+                  parent="maintenance.menu_maintenance_configuration"
+                  action="radio_type_action_view"
+                  sequence="14"/>
+
+        <menuitem id="rt_type_action_menu"
+                  name="RT Type"
+                  parent="maintenance.menu_maintenance_configuration"
+                  action="rt_type_action_view"
+                  sequence="5"/>
+
+        <menuitem id="tower_type_action_menu"
+                  name="Tower Type"
+                  parent="maintenance.menu_maintenance_configuration"
+                  action="tower_type_action_view"
+                  sequence="7"/>
+
+        <menuitem id="tower_topology_action_menu"
+                  name="Tower Topology"
+                  parent="maintenance.menu_maintenance_configuration"
+                  action="tower_topology_action_view"
+                  sequence="18"/>
+
+        <menuitem id="site_planning_lines_menu"
+                  name="Site Planning Lines"
+                  parent="ejaf_maintenance_menus.site_reporting_categ"
+                  action="site_planning_lines_action"
+                  sequence="1"/>
+
+        <menuitem id="site_types"
+                  name="Site Types"
+                  parent="maintenance.menu_maintenance_configuration"
+                  action="site_types_action"/>
+
+        <menuitem id="menu_approvals_global_settings" name="Settings"
+                  parent="maintenance.menu_maintenance_configuration"
+                  sequence="0"
+                  action="action_maintenance_configuration"
+                  groups="base.group_system"/>
+    </data>
+</odoo>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <data>
+        <record id="material_request_comp_rule" model="ir.rule">
+            <field name="name">Material Request Multi-company rule</field>
+            <field name="model_id" ref="model_material_request"/>
+            <field name="domain_force">['|',('company_id','=',False),('company_id', 'in', company_ids)]</field>
+        </record>
+    </data>
+</odoo>

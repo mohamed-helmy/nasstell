@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <data>
+
+        <record id="maintenance_request_timeline_tree_view" model="ir.ui.view">
+            <field name="name">maintenance.request.timeline.tree.view</field>
+            <field name="model">maintenance.request.timeline</field>
+            <field name="arch" type="xml">
+                <tree create="0" delete="0" editable="top">
+                    <field name="maintenance_request_id" invisible="1"/>
+                    <field name="start_time"/>
+                    <field name="end_time"/>
+                    <field name="duration_str"/>
+                    <field name="duration" widget="float_time" sum="Total Duration" optional="hide"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="maintenance_request_timeline_action" model="ir.actions.act_window">
+            <field name="name">Maintenance Request Timeline</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">maintenance.request.timeline</field>
+            <field name="view_mode">tree</field>
+        </record>
+
+    </data>
+</odoo>

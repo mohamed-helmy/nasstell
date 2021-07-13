@@ -1,0 +1,362 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <data>
+        <record id="maintenance_request_search_view_inherit" model="ir.ui.view">
+            <field name="name">maintenance.request.search.view.inherit</field>
+            <field name="model">maintenance.request</field>
+            <field name="inherit_id" ref="maintenance.hr_equipment_request_view_search"/>
+            <field name="arch" type="xml">
+                <filter name="kanban_state_block" position="attributes">
+                    <attribute name="string">Need To Repaired</attribute>
+                </filter>
+                <filter name="done" position="attributes">
+                    <attribute name="string">Reviewed</attribute>
+                </filter>
+                <xpath expr="//filter[last()]" position="after">
+                    <filter name="today" string="Today"
+                            domain="[('request_date', '=', context_today().strftime('%Y-%m-%d'))]"/>
+                    <filter name="start_date_filter" string="This Week" domain="[
+                        ('request_date', '>=', (datetime.datetime.combine(context_today() + relativedelta(weeks=-1,days=1,weekday=0), datetime.time(0,0,0)).to_utc()).strftime('%Y-%m-%d %H:%M:%S')),
+                        ('request_date', '&lt;', (datetime.datetime.combine(context_today() + relativedelta(days=1,weekday=0), datetime.time(0,0,0)).to_utc()).strftime('%Y-%m-%d %H:%M:%S'))]"/>
+                    <filter name="month" string="This Month"
+                            domain="['&amp;',('request_date', '&gt;=', (context_today() + relativedelta(day=1)).strftime('%Y-%m-%d')),('request_date', '&lt;=', (context_today() + relativedelta(months=1, day=1, days=-1)).strftime('%Y-%m-%d')),]"/>
+                    <filter name="this_year" string="This Year"
+                            domain="[
+                                '&amp;',
+                                ('request_date', '&gt;=', datetime.datetime.combine(context_today()+relativedelta(month=1,day=1), datetime.time(0,0,0) ) ),
+                                ('request_date', '&lt;=', datetime.datetime.combine(context_today()+relativedelta(month=12,day=31),  datetime.time(23,59,59))),
+                            ]"/>
+
+                </xpath>
+            </field>
+        </record>
+
+        <record id="maintenance_stage_form_view_inherit" model="ir.ui.view">
+            <field name="name">maintenance.stage.form.view.inherit</field>
+            <field name="model">maintenance.stage</field>
+            <field name="inherit_id" ref="maintenance.hr_equipment_stage_view_tree"/>
+            <field name="arch" type="xml">
+                <field name="name" position="after">
+                    <field name="state" required="1"/>
+                </field>
+            </field>
+        </record>
+        <record id="maintenance_request_form_view_inherit" model="ir.ui.view">
+            <field name="name">maintenance.request.form.view.inherit</field>
+            <field name="model">maintenance.request</field>
+            <field name="inherit_id" ref="maintenance.hr_equipment_request_view_form"/>
+            <field name="arch" type="xml">
+                <field name="kanban_state" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </field>
+                <field name="user_id" position="before">
+                    <field name="member_ids"
+                           options="{'no_create': True}"
+                           widget="many2many_tags"
+                           attrs="{'invisible':[('maintenance_type','=','preventive')]}"/>
+                </field>
+                <field name="maintenance_type" position="after">
+                    <field name="maintenance_tag"
+                           attrs="{'invisible':[('maintenance_type','!=','preventive')]}"/>
+                    <field name="state" invisible="1"/>
+
+                    <field name="checklist_ids"
+                           colspan="4"
+                           domain="[('type','=',maintenance_tag),('is_default','=',True)]"
+                           widget="many2many_tags"
+                           attrs="{'invisible':[('maintenance_type','!=','preventive')]}"/>
+
+                    <field name="planned_generator_ids"
+                           colspan="4"
+                           widget="many2many_tags"
+                           domain="[('site_id','=',equipment_id)]"
+                           context="{'default_site_id':equipment_id}"
+                           attrs="{'invisible':['|',('maintenance_type','!=','preventive'),('maintenance_tag','!=','generators')]}"/>
+
+                </field>
+                <field name="schedule_date" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </field>
+                <field name="duration" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </field>
+                <xpath expr="//sheet/group" position="inside">
+                    <group string="PM Status"
+                           attrs="{'invisible':[('maintenance_tag','!=','full_site')]}">
+                        <field name="pm_status_first_visit"
+                               attrs="{'invisible':[('maintenance_tag','!=','full_site')]}"/>
+                        <field name="pm_status_first_visit_date"
+                               attrs="{'invisible':[('maintenance_tag','!=','full_site')]}"/>
+                        <field name="pm_status_second_visit"
+                               attrs="{'invisible':[('maintenance_tag','!=','full_site')]}"/>
+                        <field name="pm_status_second_visit_date"
+                               attrs="{'invisible':[('maintenance_tag','!=','full_site')]}"/>
+                    </group>
+                </xpath>
+                <xpath expr="//button[@name='archive_equipment_request']" position="before">
+
+                    <button class="btn-primary"
+                            name="action_timer_start"
+                            type="object"
+                            string="Start"
+                            attrs="{'invisible': [('timer_started', '=', True)]}"/>
+
+                    <button class="btn-primary btn-danger o_fsm_stop"
+                            name="action_timer_stop"
+                            type="object"
+                            string="Stop"
+                            attrs="{'invisible': ['|', ('timer_started', '=', False), ('timer_stopped', '=', True)]}"/>
+                    <button class="btn-primary"
+                            name="action_need_to_repaired"
+                            type="object"
+                            attrs="{'invisible':[('state','=','draft')]}"
+                            string="Need To Repaired"/>
+                    <button class="btn-primary"
+                            name="action_reviewed"
+                            attrs="{'invisible':[('state','=','repaired')]}"
+                            type="object"
+                            string="Reviewed"/>
+
+                </xpath>
+
+                <xpath expr="//field[@name='stage_id']" position="attributes">
+                    <attribute name="class">ml-2</attribute>
+                </xpath>
+                <xpath expr="//field[@name='stage_id']" position="before">
+                    <field name="timer_start"
+                           widget="maintenance_timer"
+                           attrs="{'invisible': [('timer_last_stop', '!=', False)]}"
+                           class="text-danger ml-auto h2 ml-4 font-weight-bold"/>
+                </xpath>
+                <field name="schedule_date" position="after">
+                    <field name="timer_started" invisible="1"/>
+                    <field name="timer_stopped" invisible="1"/>
+                    <field name="timer_first_start" invisible="1"/>
+                    <field name="timer_last_stop" force_save="1" invisible="0"/>
+                    <field name="starting_time_date" invisible="1"/>
+                </field>
+                <xpath expr="//field[@name='description']" position="after">
+                    <notebook>
+                        <page string="Generator Checklists"
+                              attrs="{'invisible':[('maintenance_tag','!=','generators')]}">
+                            <form>
+                                <group>
+                                    <group>
+                                        <field name="status"/>
+                                        <field name="activity"
+                                               options="{'no_create_edit':'1'}"
+                                               widget="many2many_tags"/>
+                                    </group>
+                                    <group/>
+                                    <group colspan="4">
+                                        <field name="generator_rh_ids">
+                                            <tree editable="bottom">
+                                                <field name="maintenance_request_id" invisible="1"/>
+                                                <field name="site_id" invisible="1"/>
+                                                <field name="generator_id"
+                                                       required="1"
+                                                       domain="[('site_id','=',site_id)]"
+                                                       context="{'default_site_id':site_id}"/>
+                                                <field name="rh" required="1"/>
+                                            </tree>
+                                        </field>
+                                    </group>
+                                    <group>
+                                        <field name="remark"/>
+                                    </group>
+                                </group>
+                            </form>
+                        </page>
+                        <page string="Fuel Distribution"
+                              attrs="{'invisible':[('maintenance_tag','!=','fuel_planning')]}">
+                            <form>
+                                <group>
+                                    <group>
+                                        <field name="g1rh"/>
+                                        <field name="g2rh"/>
+                                        <field name="days"/>
+                                    </group>
+                                    <group>
+                                        <field name="liters_per_hour" invisible="1"/>
+                                        <field name="tank_size"/>
+                                    </group>
+                                    <group>
+                                        <field name="liters_in_the_tank"/>
+                                        <field name="filling_liters"/>
+                                    </group>
+                                    <group>
+                                        <field name="total_liters"/>
+                                        <field name="c_p_status"/>
+                                    </group>
+                                    <group/>
+                                </group>
+                            </form>
+                        </page>
+                        <page string="Fuel Analysis"
+                              attrs="{'invisible':[('maintenance_tag','!=','fuel_planning')]}">
+                            <form>
+                                <group>
+                                    <group>
+                                        <field name="g1rh_analysis"/>
+                                        <field name="g2rh_analysis"/>
+                                        <field name="total_rhs"/>
+                                        <field name="days"/>
+                                    </group>
+                                    <group>
+                                        <field name="liters_per_hour"/>
+                                        <field name="rh_per_day"/>
+                                    </group>
+                                    <group>
+                                        <field name="tank_size"/>
+                                        <field name="reservation_liters"/>
+                                        <field name="available_for_use"/>
+                                    </group>
+                                    <group>
+                                        <field name="remain_letters"/>
+                                        <field name="remaining_days_before_next_visit"/>
+                                        <field name="next_visit_plan"/>
+                                    </group>
+                                    <group/>
+                                </group>
+                            </form>
+                        </page>
+                    </notebook>
+                </xpath>
+                <field name="equipment_id" position="attributes">
+                    <attribute name="string">Site</attribute>
+                    <attribute name="required">1</attribute>
+                </field>
+                <field name="email_cc" position="after">
+                    <field name="starting_time"/>
+                    <field name="end_time"/>
+
+                    <label for="duration_str"/>
+                    <div>
+                        <field name="duration_str" class="oe_inline"/>
+                        <button type='object' class="fa fa-arrow-right oe_link" name="button_open_request_timeline"
+                                string="Timeline"
+                                attrs="{'invisible': [('maintenance_type', 'not in', ['corrective', 'preventive'])]}"/>
+                    </div>
+
+                    <field name="is_team_leader" invisible="1"/>
+                </field>
+                <field name="category_id" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </field>
+                <field name="user_id" position="attributes">
+                    <attribute name="string">Technician</attribute>
+                </field>
+                <field name="description" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </field>
+                <xpath expr="//div[@class='oe_right']" position="before">
+                    <div class="oe_button_box" name="button_box">
+                        <button string="Check List"
+                                class="oe_stat_button"
+                                type="object"
+                                attrs="{'invisible':[('maintenance_type','!=','preventive')]}"
+                                icon="fa-list" name="action_view_checklist">
+                        </button>
+                    </div>
+                </xpath>
+                <field name="equipment_id" position="after">
+                    <field name="site_code" readonly="1" force_save="1"/>
+                </field>
+                <xpath expr="//notebook" position="inside">
+                    <page string="By Korek NMC"
+                          attrs="{'invisible':[('maintenance_type','=','preventive')]}">
+                        <group>
+                            <group>
+                                <field name="ne_type_id"/>
+                                <field name="ne_impacted_id"/>
+                                <field name="gov"/>
+                                <field name="effected_trxs"
+                                       attrs="{'required':[('maintenance_type','=','emergency')]}"/>
+                                <field name="effected_cells"
+                                       attrs="{'required':[('maintenance_type','=','emergency')]}"/>
+                                <field name="effected_sites"
+                                       attrs="{'required':[('maintenance_type','=','emergency')]}"/>
+                            </group>
+                            <group>
+                                <field name="alarm_time"
+                                       attrs="{'required':[('maintenance_type','=','emergency')]}"/>
+                                <field name="tt_issuing_time"
+                                       attrs="{'required':[('maintenance_type','=','emergency')]}"/>
+                                <field name="closing_outage_time"
+                                       string="Restoration Time"/>
+                                <field name="outage_duration" invisible="1"/>
+                                <field name="outage_duration_str"/>
+                            </group>
+                            <group>
+                                <field name="bsc_name"/>
+                                <field name="tg_number"/>
+                                <field name="tt_issuer"
+                                       attrs="{'required':[('maintenance_type','=','emergency')]}"/>
+                                <field name="tt_no"
+                                       attrs="{'required':[('maintenance_type','=','emergency')]}"/>
+                                <field name="tt_status"
+                                       attrs="{'required':[('maintenance_type','=','emergency')]}"/>
+                            </group>
+                            <group>
+                                <field name="alarm_description"/>
+                            </group>
+                            <group>
+                                <field name="starting_outage_time"
+                                       invisible="1"/>
+
+                            </group>
+
+                        </group>
+                    </page>
+                    <page string="By Nastell FLM"
+                          attrs="{'invisible':[('maintenance_type','=','preventive')]}">
+                        <group>
+                            <group>
+                                <field name="id_permission_time" invisible="1"/>
+                                <div>
+                                    <label for="vol_str" style="width:40%"/>
+                                    <field name="vol_option"
+                                           string=""
+                                           widget="boolean_toggle"
+                                           class="o_light_label"/>
+                                    <br/>
+                                    <field name="vol_str"
+                                           readonly="1"
+                                           force_save="1"/>
+                                </div>
+                                <div>
+                                    <label for="in_vol_str" style="width:40%"/>
+                                    <field name="in_vol_option"
+                                           string=""
+                                           widget="boolean_toggle"
+                                           class="o_light_label"/>
+                                    <br/>
+                                    <field name="in_vol_str" readonly="1" force_save="1"/>
+                                </div>
+                            </group>
+                            <group>
+                                <field name="outage_category_id"/>
+                                <field name="problem_category_id"/>
+                                <field name="sub_category_id"/>
+                                <field name="id_permission_time_str"/>
+                            </group>
+                            <group>
+                                <field name="route_cause"/>
+                                <field name="why_it_happened"/>
+                                <field name="site_severity"/>
+                                <field name="action_taken"/>
+                                <field name="any_sp_used"/>
+                                <field name="comment"/>
+                            </group>
+                        </group>
+                    </page>
+                </xpath>
+
+                <xpath expr="//button[@name='reset_equipment_request']" position="after">
+                    <field name="job_order_count" invisible="1"/>
+                </xpath>
+            </field>
+        </record>
+
+    </data>
+</odoo>
